@@ -55,13 +55,21 @@
       --page-bg: #ffffff;
       --text-color: #1f2328;
       --title-color: #0969da;
-      --subtitle-color: #c59b27;
+      --subtitle-color: #b38600;
       --border-color: #d0d7de;
       --info-bg: #f0f7ff;
       --info-border: #0969da;
       --table-header-bg: #eaeef2;
       --table-header-text: #0969da;
       --font-scale: 1;
+
+      /* PORTADA CLARA */
+      --cover-bg: linear-gradient(135deg, #ffffff 0%, #f0f4f8 100%);
+      --cover-title: #004b87;
+      --cover-subtitle: #b38600;
+      --cover-text: #24292f;
+      --cover-subtext: #57606a;
+      --cover-tag: #1a7f37;
     }
 
     :root[data-theme="dark"] {
@@ -76,6 +84,14 @@
       --info-border: #58a6ff;
       --table-header-bg: #21262d;
       --table-header-text: #58a6ff;
+
+      /* PORTADA OSCURA */
+      --cover-bg: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
+      --cover-title: #58a6ff;
+      --cover-subtitle: #c59b27;
+      --cover-text: #c9d1d9;
+      --cover-subtext: #8b949e;
+      --cover-tag: #39d353;
     }
 
     body {
@@ -89,10 +105,16 @@
       background-color: var(--page-bg) !important;
       color: var(--text-color) !important;
       border-color: var(--border-color) !important;
+      transition: background-color 0.3s ease, color 0.3s ease;
     }
 
     h1, h2, h3 {
       color: var(--title-color) !important;
+    }
+
+    .cover-page {
+      background-image: var(--cover-bg) !important;
+      border: 1px solid var(--border-color) !important;
     }
 
     .controls-toolbar {
@@ -190,22 +212,22 @@
       <!-- Página vacía de guarda -->
       <div class="page" style="background-color:transparent;"></div>
 
-      <!-- PORTADA PRINCIPAL -->
-      <div class="page invertcolor" style="margin:0; padding:0; background-size:cover; background-image:linear-gradient(135deg, #0d1117 0%, #161b22 100%);">
+      <!-- PORTADA PRINCIPAL DINÁMICA DE TEMA (NTE-UAN-APK-001 v1.3) -->
+      <div class="page cover-page" style="margin:0; padding:0; background-size:cover;">
         <div style="padding: 40px 20px; text-align: center;">
-          <h1 style="font-size: 2.2rem; color: #58a6ff; margin-bottom: 10px;">Lógica y Conjuntos</h1>
-          <h2 style="font-size: 1.2rem; color: #c59b27; font-weight: normal;">Libro Digital Interactivo & Escenas HTML5</h2>
+          <h1 style="font-size: 2.2rem; color: var(--cover-title) !important; margin-bottom: 10px;">Lógica y Conjuntos</h1>
+          <h2 style="font-size: 1.2rem; color: var(--cover-subtitle) !important; font-weight: normal;">Libro Digital Interactivo & Escenas HTML5</h2>
           
           <div style="margin: 40px 0;">
             <img src="images/general/icartesilibri_logo.svg" width="35%" alt="Red Descartes">
           </div>
 
-          <div style="margin-top: 60px; font-size: 0.95rem; color: #8b949e;">
-            <p><strong>Dr. Pablo Eduardo Cancino Marentes</strong></p>
-            <p>Dr. Sergio Enrique Yarza Acuña</p>
-            <p style="margin-top: 15px;">Universidad Autónoma de Nayarit (UAN)</p>
+          <div style="margin-top: 60px; font-size: 0.95rem; color: var(--cover-subtext);">
+            <p><strong style="color: var(--cover-text);">Dr. Pablo Eduardo Cancino Marentes</strong></p>
+            <p style="color: var(--cover-text);">Dr. Sergio Enrique Yarza Acuña</p>
+            <p style="margin-top: 15px; color: var(--cover-text);">Universidad Autónoma de Nayarit (UAN)</p>
             <p>Red Educativa Digital Descartes</p>
-            <p style="color: #39d353; font-size:0.85rem; margin-top:10px;">Norma NTE-UAN-APK-001 v1.3 · CBIMAT-215</p>
+            <p style="color: var(--cover-tag); font-size:0.85rem; margin-top:10px; font-weight:bold;">Norma NTE-UAN-APK-001 v1.3 · CBIMAT-215</p>
           </div>
         </div>
       </div>
