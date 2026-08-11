@@ -111,12 +111,33 @@ xmp {
   text-shadow: 1px 2px rgba(0,0,0,0.15);
 }
 
-table {
-  border-collapse: collapse;
-  border: 1px solid var(--text-color);
+/* Alineación simple a la izquierda para tablas (NTE-UAN-APK-001) */
+table, table *, table th, table td {
+  text-align: left !important;
+  word-spacing: normal !important;
+  letter-spacing: normal !important;
+  text-justify: auto !important;
 }
+
+table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  border: 1px solid var(--border-color, #d0d7de) !important;
+  margin: 15px 0 !important;
+}
+
+table th {
+  background: var(--table-header-bg, #eaeef2) !important;
+  color: var(--table-header-text, #0969da) !important;
+  font-weight: bold !important;
+  padding: 8px 12px !important;
+  border: 1px solid var(--border-color, #d0d7de) !important;
+}
+
 table td {
-  border: 1px solid var(--text-color);
+  padding: 8px 12px !important;
+  border: 1px solid var(--border-color, #d0d7de) !important;
+  vertical-align: top !important;
 }
 
 body.dark .invertcolor {
