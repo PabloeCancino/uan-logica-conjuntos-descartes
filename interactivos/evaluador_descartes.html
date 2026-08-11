@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,6 +12,25 @@
 
   <style>
     :root {
+      /* MODO CLARO (Default) */
+      --bg-color: #ffffff;
+      --card-bg: #f6f8fa;
+      --border-color: #d0d7de;
+      --accent-blue: #0969da;
+      --accent-green: #1a7f37;
+      --accent-red: #cf222e;
+      --accent-purple: #8250df;
+      --text-color: #24292f;
+      --text-bright: #0f172a;
+      --btn-bg: #ffffff;
+      --btn-hover: #eaeef2;
+      --info-bg: #f0f7ff;
+      --score-bg: #e6ffec;
+      --score-border: #1a7f37;
+    }
+
+    :root[data-theme="dark"] {
+      /* MODO OSCURO */
       --bg-color: #0d1117;
       --card-bg: #161b22;
       --border-color: #30363d;
@@ -21,6 +40,11 @@
       --accent-purple: #bc8cff;
       --text-color: #c9d1d9;
       --text-bright: #ffffff;
+      --btn-bg: #21262d;
+      --btn-hover: #30363d;
+      --info-bg: #0d1117;
+      --score-bg: #21262d;
+      --score-border: #30363d;
     }
 
     body {
@@ -32,6 +56,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      transition: background-color 0.3s ease, color 0.3s ease;
     }
 
     h2 {
@@ -65,7 +90,7 @@
       justify-content: space-between;
       align-items: center;
       font-size: 0.9rem;
-      color: #8b949e;
+      color: var(--text-color);
       border-bottom: 1px solid var(--border-color);
       padding-bottom: 8px;
     }
@@ -83,7 +108,7 @@
     }
 
     .opt-btn {
-      background: #21262d;
+      background: var(--btn-bg);
       color: var(--text-color);
       border: 1px solid var(--border-color);
       border-radius: 6px;
@@ -98,7 +123,7 @@
     }
 
     .opt-btn:hover {
-      background: #30363d;
+      background: var(--btn-hover);
       border-color: var(--accent-blue);
     }
 
@@ -115,13 +140,15 @@
     }
 
     .explanation-box {
-      background: #0d1117;
+      background: var(--info-bg);
       border-left: 4px solid var(--accent-purple);
       border-radius: 0 6px 6px 0;
       padding: 12px 14px;
       font-size: 0.95rem;
       line-height: 1.4;
       display: none;
+      border: 1px solid var(--border-color);
+      border-left-width: 4px;
     }
 
     .controls {
@@ -132,7 +159,7 @@
 
     .btn-nav {
       background: var(--accent-blue);
-      color: #000;
+      color: #ffffff;
       border: none;
       border-radius: 6px;
       padding: 8px 16px;
@@ -141,8 +168,8 @@
     }
 
     .score-badge {
-      background: #21262d;
-      border: 1px solid var(--border-color);
+      background: var(--score-bg);
+      border: 1px solid var(--score-border);
       padding: 4px 12px;
       border-radius: 12px;
       font-weight: bold;
@@ -171,13 +198,26 @@
       </div>
 
       <div class="controls">
-        <div id="q-progress" style="font-size:0.9rem; color:#8b949e;">Pregunta 1 de 5</div>
+        <div id="q-progress" style="font-size:0.9rem; color:var(--text-color);">Pregunta 1 de 5</div>
         <button class="btn-nav" id="btn-next" onclick="nextQuestion()" style="display:none;">Siguiente Reactivo →</button>
       </div>
     </div>
   </div>
 
   <script>
+    // Manejador de temas
+    window.addEventListener('message', (event) => {
+      if (event.data && event.data.type === 'THEME_CHANGE') {
+        document.documentElement.setAttribute('data-theme', event.data.theme);
+      }
+    });
+    try {
+      if (window.parent && window.parent.document && window.parent.document.documentElement) {
+        const pTheme = window.parent.document.documentElement.getAttribute('data-theme') || 'light';
+        document.documentElement.setAttribute('data-theme', pTheme);
+      }
+    } catch(e) {}
+
     const sampleQuestions = [
       {
         modulo: "Lógica Proposicional",

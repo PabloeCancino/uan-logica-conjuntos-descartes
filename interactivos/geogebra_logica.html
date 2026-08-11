@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,6 +15,19 @@
 
   <style>
     :root {
+      /* MODO CLARO (Default) */
+      --bg-color: #ffffff;
+      --card-bg: #f6f8fa;
+      --border-color: #d0d7de;
+      --accent-blue: #0969da;
+      --accent-orange: #cf222e;
+      --text-color: #24292f;
+      --text-bright: #0f172a;
+      --info-bg: #fff5f5;
+    }
+
+    :root[data-theme="dark"] {
+      /* MODO OSCURO */
       --bg-color: #0d1117;
       --card-bg: #161b22;
       --border-color: #30363d;
@@ -22,6 +35,7 @@
       --accent-orange: #f0883e;
       --text-color: #c9d1d9;
       --text-bright: #ffffff;
+      --info-bg: #0d1117;
     }
 
     body {
@@ -33,6 +47,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      transition: background-color 0.3s ease, color 0.3s ease;
     }
 
     h2 {
@@ -71,7 +86,7 @@
 
     .info-box {
       width: 100%;
-      background: #0d1117;
+      background: var(--info-bg);
       border-left: 4px solid var(--accent-orange);
       border-radius: 0 6px 6px 0;
       padding: 12px 16px;
@@ -79,6 +94,8 @@
       margin-top: 12px;
       font-size: 0.95rem;
       line-height: 1.4;
+      border: 1px solid var(--border-color);
+      border-left-width: 4px;
     }
   </style>
 </head>
@@ -98,6 +115,19 @@
   </div>
 
   <script>
+    // Manejador de temas
+    window.addEventListener('message', (event) => {
+      if (event.data && event.data.type === 'THEME_CHANGE') {
+        document.documentElement.setAttribute('data-theme', event.data.theme);
+      }
+    });
+    try {
+      if (window.parent && window.parent.document && window.parent.document.documentElement) {
+        const pTheme = window.parent.document.documentElement.getAttribute('data-theme') || 'light';
+        document.documentElement.setAttribute('data-theme', pTheme);
+      }
+    } catch(e) {}
+
     const params = {
       "appName": "classic",
       "width": 700,
@@ -105,7 +135,7 @@
       "showToolBar": false,
       "showAlgebraInput": false,
       "showMenuBar": false,
-      "material_id": "R4tGkWZz", // Public GeoGebra material sample for set logic
+      "material_id": "R4tGkWZz",
       "allowStyleBar": false,
       "borderColor": "#30363d",
       "capturingThreshold": null,

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,6 +12,27 @@
 
   <style>
     :root {
+      /* MODO CLARO (Default) */
+      --bg-color: #ffffff;
+      --card-bg: #f6f8fa;
+      --border-color: #d0d7de;
+      --accent-color: #0969da;
+      --accent-green: #1a7f37;
+      --accent-purple: #8250df;
+      --accent-orange: #cf222e;
+      --text-color: #24292f;
+      --text-bright: #0f172a;
+      --btn-bg: #f3f4f6;
+      --btn-hover: #e5e7eb;
+      --info-bg: #f0f7ff;
+      --svg-u-fill: #ffffff;
+      --svg-u-stroke: #d0d7de;
+      --svg-u-text: #57606a;
+      --svg-label-text: #0f172a;
+    }
+
+    :root[data-theme="dark"] {
+      /* MODO OSCURO */
       --bg-color: #0d1117;
       --card-bg: #161b22;
       --border-color: #30363d;
@@ -21,8 +42,13 @@
       --accent-orange: #f0883e;
       --text-color: #c9d1d9;
       --text-bright: #ffffff;
-      --shading: rgba(88, 166, 255, 0.45);
-      --shading-stroke: #58a6ff;
+      --btn-bg: #21262d;
+      --btn-hover: #30363d;
+      --info-bg: #0d1117;
+      --svg-u-fill: #161b22;
+      --svg-u-stroke: #30363d;
+      --svg-u-text: #8b949e;
+      --svg-label-text: #ffffff;
     }
 
     body {
@@ -34,6 +60,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      transition: background-color 0.3s ease, color 0.3s ease;
     }
 
     h2 {
@@ -64,7 +91,7 @@
     }
 
     .btn {
-      background: #21262d;
+      background: var(--btn-bg);
       color: var(--text-color);
       border: 1px solid var(--border-color);
       border-radius: 6px;
@@ -78,21 +105,21 @@
     }
 
     .btn:hover {
-      background: #30363d;
+      background: var(--btn-hover);
       color: var(--text-bright);
       border-color: var(--accent-color);
     }
 
     .btn.active {
       background: var(--accent-color);
-      color: #000;
+      color: #ffffff;
       font-weight: bold;
       border-color: var(--accent-color);
     }
 
     .btn-mode {
-      background: #1f6feb;
-      color: #fff;
+      background: var(--accent-color);
+      color: #ffffff;
     }
 
     .venn-card {
@@ -117,18 +144,20 @@
     }
 
     .venn-region:hover {
-      opacity: 0.8;
+      opacity: 0.85;
       stroke-width: 2.5px;
     }
 
     .info-box {
       width: 100%;
-      background: #0d1117;
+      background: var(--info-bg);
       border-left: 4px solid var(--accent-color);
       border-radius: 0 6px 6px 0;
       padding: 12px 16px;
       box-sizing: border-box;
       margin-top: 12px;
+      border: 1px solid var(--border-color);
+      border-left-width: 4px;
     }
 
     .info-title {
@@ -146,7 +175,7 @@
     .explanation {
       font-size: 0.9rem;
       line-height: 1.4;
-      color: #8b949e;
+      color: var(--text-color);
     }
   </style>
 </head>
@@ -180,6 +209,28 @@
   <script>
     let mode3Sets = false;
     let activeRegions = new Set();
+    let currentTheme = 'light';
+
+    // Manejador de sincronización de temas con el libro padre
+    function applyTheme(theme) {
+      currentTheme = theme;
+      document.documentElement.setAttribute('data-theme', theme);
+      updateSVG();
+    }
+
+    window.addEventListener('message', (event) => {
+      if (event.data && event.data.type === 'THEME_CHANGE') {
+        applyTheme(event.data.theme);
+      }
+    });
+
+    // Intentar leer el tema inicial desde el padre si está disponible
+    try {
+      if (window.parent && window.parent.document && window.parent.document.documentElement) {
+        const parentTheme = window.parent.document.documentElement.getAttribute('data-theme') || 'light';
+        applyTheme(parentTheme);
+      }
+    } catch(e) {}
 
     const presetOps2 = [
       { id: 'union', label: 'A ∪ B', formula: 'A \\cup B', regions: ['rA', 'rB', 'rAB'], exp: 'Unión: Elementos que pertenecen a A, a B o a ambos.' },
@@ -237,6 +288,16 @@
 
     function drawSVG2Sets() {
       const svg = document.getElementById('venn-svg');
+      const isDark = (currentTheme === 'dark');
+      const uFill = isDark ? '#161b22' : '#ffffff';
+      const uStroke = isDark ? '#30363d' : '#d0d7de';
+      const uText = isDark ? '#8b949e' : '#57606a';
+      const labelText = isDark ? '#ffffff' : '#0f172a';
+
+      const colorA = isDark ? '88,166,255' : '9,105,218';
+      const colorB = isDark ? '57,211,83' : '26,127,55';
+      const colorAB = isDark ? '188,140,255' : '130,80,223';
+
       svg.innerHTML = `
         <defs>
           <mask id="mask-A-only">
@@ -254,59 +315,69 @@
 
         <!-- Universal Set U -->
         <rect id="rU" class="venn-region" x="20" y="20" width="460" height="280" rx="10" 
-              fill="${activeRegions.has('rU') ? 'rgba(88,166,255,0.4)' : '#161b22'}" 
-              stroke="#30363d" stroke-width="2" onclick="toggleRegion('rU')"/>
-        <text x="35" y="45" fill="#8b949e" font-size="18" font-weight="bold">U</text>
+              fill="${activeRegions.has('rU') ? `rgba(${colorA},0.35)` : uFill}" 
+              stroke="${uStroke}" stroke-width="2" onclick="toggleRegion('rU')"/>
+        <text x="35" y="45" fill="${uText}" font-size="18" font-weight="bold">U</text>
 
         <!-- Region A Only -->
         <circle id="rA" class="venn-region" cx="190" cy="160" r="100" 
                 mask="url(#mask-A-only)"
-                fill="${activeRegions.has('rA') ? 'rgba(88,166,255,0.6)' : 'rgba(88,166,255,0.1)'}" 
+                fill="${activeRegions.has('rA') ? `rgba(${colorA},0.55)` : `rgba(${colorA},0.1)`}" 
                 onclick="toggleRegion('rA')"/>
 
         <!-- Region B Only -->
         <circle id="rB" class="venn-region" cx="310" cy="160" r="100" 
                 mask="url(#mask-B-only)"
-                fill="${activeRegions.has('rB') ? 'rgba(57,211,83,0.6)' : 'rgba(57,211,83,0.1)'}" 
+                fill="${activeRegions.has('rB') ? `rgba(${colorB},0.55)` : `rgba(${colorB},0.1)`}" 
                 onclick="toggleRegion('rB')"/>
 
         <!-- Region A inter B -->
         <circle id="rAB" class="venn-region" cx="190" cy="160" r="100" 
                 mask="url(#mask-inter)"
-                fill="${activeRegions.has('rAB') ? 'rgba(188,140,255,0.7)' : 'rgba(188,140,255,0.15)'}" 
+                fill="${activeRegions.has('rAB') ? `rgba(${colorAB},0.65)` : `rgba(${colorAB},0.15)`}" 
                 onclick="toggleRegion('rAB')"/>
 
         <!-- Circle Outlines -->
-        <circle cx="190" cy="160" r="100" fill="none" stroke="#58a6ff" stroke-width="2.5" pointer-events="none"/>
-        <circle cx="310" cy="160" r="100" fill="none" stroke="#39d353" stroke-width="2.5" pointer-events="none"/>
+        <circle cx="190" cy="160" r="100" fill="none" stroke="rgb(${colorA})" stroke-width="2.5" pointer-events="none"/>
+        <circle cx="310" cy="160" r="100" fill="none" stroke="rgb(${colorB})" stroke-width="2.5" pointer-events="none"/>
 
         <!-- Labels -->
-        <text x="140" y="165" fill="#ffffff" font-size="22" font-weight="bold" pointer-events="none">A</text>
-        <text x="340" y="165" fill="#ffffff" font-size="22" font-weight="bold" pointer-events="none">B</text>
+        <text x="140" y="165" fill="${labelText}" font-size="22" font-weight="bold" pointer-events="none">A</text>
+        <text x="340" y="165" fill="${labelText}" font-size="22" font-weight="bold" pointer-events="none">B</text>
       `;
     }
 
     function drawSVG3Sets() {
       const svg = document.getElementById('venn-svg');
+      const isDark = (currentTheme === 'dark');
+      const uFill = isDark ? '#161b22' : '#ffffff';
+      const uStroke = isDark ? '#30363d' : '#d0d7de';
+      const uText = isDark ? '#8b949e' : '#57606a';
+      const labelText = isDark ? '#ffffff' : '#0f172a';
+
+      const colorA = isDark ? '88,166,255' : '9,105,218';
+      const colorB = isDark ? '57,211,83' : '26,127,55';
+      const colorC = isDark ? '188,140,255' : '130,80,223';
+
       svg.innerHTML = `
         <rect id="rU" class="venn-region" x="20" y="20" width="460" height="280" rx="10" 
-              fill="${activeRegions.has('rU') ? 'rgba(88,166,255,0.4)' : '#161b22'}" 
-              stroke="#30363d" stroke-width="2" onclick="toggleRegion('rU')"/>
-        <text x="35" y="45" fill="#8b949e" font-size="18" font-weight="bold">U</text>
+              fill="${activeRegions.has('rU') ? `rgba(${colorA},0.35)` : uFill}" 
+              stroke="${uStroke}" stroke-width="2" onclick="toggleRegion('rU')"/>
+        <text x="35" y="45" fill="${uText}" font-size="18" font-weight="bold">U</text>
 
         <circle id="rA" class="venn-region" cx="200" cy="130" r="85" 
-                fill="${activeRegions.has('rA') || activeRegions.has('rAB') || activeRegions.has('rAC') || activeRegions.has('rABC') ? 'rgba(88,166,255,0.4)' : 'rgba(88,166,255,0.08)'}" 
-                stroke="#58a6ff" stroke-width="2" onclick="toggleRegion('rA')"/>
+                fill="${activeRegions.has('rA') || activeRegions.has('rAB') || activeRegions.has('rAC') || activeRegions.has('rABC') ? `rgba(${colorA},0.45)` : `rgba(${colorA},0.08)`}" 
+                stroke="rgb(${colorA})" stroke-width="2" onclick="toggleRegion('rA')"/>
         <circle id="rB" class="venn-region" cx="300" cy="130" r="85" 
-                fill="${activeRegions.has('rB') || activeRegions.has('rAB') || activeRegions.has('rBC') || activeRegions.has('rABC') ? 'rgba(57,211,83,0.4)' : 'rgba(57,211,83,0.08)'}" 
-                stroke="#39d353" stroke-width="2" onclick="toggleRegion('rB')"/>
+                fill="${activeRegions.has('rB') || activeRegions.has('rAB') || activeRegions.has('rBC') || activeRegions.has('rABC') ? `rgba(${colorB},0.45)` : `rgba(${colorB},0.08)`}" 
+                stroke="rgb(${colorB})" stroke-width="2" onclick="toggleRegion('rB')"/>
         <circle id="rC" class="venn-region" cx="250" cy="205" r="85" 
-                fill="${activeRegions.has('rC') || activeRegions.has('rAC') || activeRegions.has('rBC') || activeRegions.has('rABC') ? 'rgba(188,140,255,0.4)' : 'rgba(188,140,255,0.08)'}" 
-                stroke="#bc8cff" stroke-width="2" onclick="toggleRegion('rC')"/>
+                fill="${activeRegions.has('rC') || activeRegions.has('rAC') || activeRegions.has('rBC') || activeRegions.has('rABC') ? `rgba(${colorC},0.45)` : `rgba(${colorC},0.08)`}" 
+                stroke="rgb(${colorC})" stroke-width="2" onclick="toggleRegion('rC')"/>
 
-        <text x="160" y="110" fill="#ffffff" font-size="20" font-weight="bold" pointer-events="none">A</text>
-        <text x="330" y="110" fill="#ffffff" font-size="20" font-weight="bold" pointer-events="none">B</text>
-        <text x="245" y="260" fill="#ffffff" font-size="20" font-weight="bold" pointer-events="none">C</text>
+        <text x="160" y="110" fill="${labelText}" font-size="20" font-weight="bold" pointer-events="none">A</text>
+        <text x="330" y="110" fill="${labelText}" font-size="20" font-weight="bold" pointer-events="none">B</text>
+        <text x="245" y="260" fill="${labelText}" font-size="20" font-weight="bold" pointer-events="none">C</text>
       `;
     }
 

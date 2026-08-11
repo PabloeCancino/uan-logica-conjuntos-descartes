@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,6 +12,24 @@
 
   <style>
     :root {
+      /* MODO CLARO (Default) */
+      --bg-color: #ffffff;
+      --card-bg: #f6f8fa;
+      --border-color: #d0d7de;
+      --accent-blue: #0969da;
+      --accent-green: #1a7f37;
+      --accent-red: #cf222e;
+      --accent-purple: #8250df;
+      --text-color: #24292f;
+      --text-bright: #0f172a;
+      --btn-bg: #f3f4f6;
+      --btn-hover: #e5e7eb;
+      --table-th-bg: #eaeef2;
+      --input-bg: #ffffff;
+    }
+
+    :root[data-theme="dark"] {
+      /* MODO OSCURO */
       --bg-color: #0d1117;
       --card-bg: #161b22;
       --border-color: #30363d;
@@ -21,6 +39,10 @@
       --accent-purple: #bc8cff;
       --text-color: #c9d1d9;
       --text-bright: #ffffff;
+      --btn-bg: #21262d;
+      --btn-hover: #30363d;
+      --table-th-bg: #21262d;
+      --input-bg: #0d1117;
     }
 
     body {
@@ -32,6 +54,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      transition: background-color 0.3s ease, color 0.3s ease;
     }
 
     h2 {
@@ -68,7 +91,7 @@
     }
 
     .btn {
-      background: #21262d;
+      background: var(--btn-bg);
       color: var(--text-color);
       border: 1px solid var(--border-color);
       border-radius: 6px;
@@ -79,14 +102,14 @@
     }
 
     .btn:hover {
-      background: #30363d;
+      background: var(--btn-hover);
       color: var(--text-bright);
       border-color: var(--accent-blue);
     }
 
     .btn.active {
       background: var(--accent-blue);
-      color: #000;
+      color: #ffffff;
       font-weight: bold;
     }
 
@@ -104,20 +127,20 @@
     }
 
     th {
-      background: #21262d;
+      background: var(--table-th-bg);
       color: var(--accent-blue);
       font-weight: bold;
     }
 
     td input, td select {
-      background: #0d1117;
+      background: var(--input-bg);
       color: var(--text-bright);
       border: 1px solid var(--border-color);
       border-radius: 4px;
       padding: 4px 8px;
       font-size: 1rem;
       text-align: center;
-      width: 50px;
+      width: 55px;
       cursor: pointer;
     }
 
@@ -186,7 +209,7 @@
       </div>
 
       <div style="text-align: center;">
-        <button class="btn" style="background: var(--accent-green); color: #000; font-weight: bold; margin-top: 8px;" onclick="checkAnswers()">Verificar mis Respuestas</button>
+        <button class="btn" style="background: var(--accent-green); color: #ffffff; font-weight: bold; margin-top: 8px;" onclick="checkAnswers()">Verificar mis Respuestas</button>
       </div>
 
       <div id="classification-box" style="text-align: center;"></div>
@@ -194,6 +217,19 @@
   </div>
 
   <script>
+    // Manejador de temas
+    window.addEventListener('message', (event) => {
+      if (event.data && event.data.type === 'THEME_CHANGE') {
+        document.documentElement.setAttribute('data-theme', event.data.theme);
+      }
+    });
+    try {
+      if (window.parent && window.parent.document && window.parent.document.documentElement) {
+        const pTheme = window.parent.document.documentElement.getAttribute('data-theme') || 'light';
+        document.documentElement.setAttribute('data-theme', pTheme);
+      }
+    } catch(e) {}
+
     const formulas = [
       {
         name: "Condicional Simple: \\(p \\to q\\)",
@@ -217,7 +253,7 @@
       {
         name: "Modus Ponens: \\(((p \\to q) \\land p) \\to q\\)",
         headers: ["p", "q", "p \\to q", "(p \\to q) \\land p", "((p \\to q) \\land p) \\to q"],
-        evalFn: (p, q) => true, // Tautología válida
+        evalFn: (p, q) => true,
         exp: "Regla de inferencia fundamental (Modus Ponens): Si p implica q y ocurre p, entonces necesariamente ocurre q."
       },
       {
@@ -243,7 +279,6 @@
       const table = document.getElementById('truth-table');
       table.innerHTML = '';
 
-      // Header row
       const thead = document.createElement('thead');
       const trH = document.createElement('tr');
       f.headers.forEach(h => {
@@ -254,13 +289,11 @@
       thead.appendChild(trH);
       table.appendChild(thead);
 
-      // Rows
       const tbody = document.createElement('tbody');
       const rowsData = f.singleVar ? [[true], [false]] : [[true, true], [true, false], [false, true], [false, false]];
 
       rowsData.forEach(r => {
         const tr = document.createElement('tr');
-        // Input variables
         r.forEach(v => {
           const td = document.createElement('td');
           td.className = v ? 'val-v' : 'val-f';
@@ -268,12 +301,11 @@
           tr.appendChild(td);
         });
 
-        // Intermediate columns (if any)
         for (let c = r.length; c < f.headers.length; c++) {
           const td = document.createElement('td');
           const sel = document.createElement('select');
           sel.innerHTML = `<option value="">?</option><option value="V">V</option><option value="F">F</option>`;
-          sel.dataset.correct = (c === f.headers.length - 1) ? (f.singleVar ? f.evalFn(r[0]) : f.evalFn(r[0], r[1])) ? 'V' : 'F' : 'V'; // simplify for interactive test
+          sel.dataset.correct = (c === f.headers.length - 1) ? (f.singleVar ? f.evalFn(r[0]) : f.evalFn(r[0], r[1])) ? 'V' : 'F' : 'V';
           td.appendChild(sel);
           tr.appendChild(td);
         }
@@ -294,10 +326,10 @@
         const correctVal = sel.dataset.correct;
         if (userVal === correctVal) {
           sel.style.borderColor = 'var(--accent-green)';
-          sel.style.background = 'rgba(57, 211, 83, 0.2)';
+          sel.style.background = 'rgba(57, 211, 83, 0.25)';
         } else {
           sel.style.borderColor = 'var(--accent-red)';
-          sel.style.background = 'rgba(248, 81, 73, 0.2)';
+          sel.style.background = 'rgba(248, 81, 73, 0.25)';
           allCorrect = false;
         }
         results.push(correctVal);
@@ -319,7 +351,7 @@
       if (allCorrect) {
         box.innerHTML = `
           <div class="result-badge ${badgeClass}">${typeText}</div>
-          <p style="margin-top:8px; font-size:0.95rem; color:#8b949e;">${formulas[currentIdx].exp}</p>
+          <p style="margin-top:8px; font-size:0.95rem; color:var(--text-color);">${formulas[currentIdx].exp}</p>
         `;
       } else {
         box.innerHTML = `
