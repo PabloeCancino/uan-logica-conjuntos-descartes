@@ -50,7 +50,7 @@
       background-color: var(--bg-color);
       color: var(--text-color);
       margin: 0;
-      padding: 6px 10px;
+      padding: 8px 12px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -59,12 +59,16 @@
       transition: background-color 0.3s ease, color 0.3s ease;
     }
 
+    /* TÍTULO INTERIOR COMPACTO DE MENOR TAMAÑO */
     h2 {
       color: var(--accent-blue);
       margin-top: 0;
       margin-bottom: 4px;
-      font-size: 1.1rem;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
       text-align: center;
+      opacity: 0.9;
     }
 
     .container {
@@ -79,16 +83,16 @@
       background: var(--card-bg);
       border: 1px solid var(--border-color);
       border-radius: 6px;
-      padding: 8px 10px;
+      padding: 10px 12px;
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 8px;
     }
 
     .presets {
       display: flex;
       flex-wrap: wrap;
-      gap: 5px;
+      gap: 6px;
       justify-content: center;
     }
 
@@ -97,8 +101,8 @@
       color: var(--text-color);
       border: 1px solid var(--border-color);
       border-radius: 4px;
-      padding: 4px 8px;
-      font-size: 0.82rem;
+      padding: 5px 10px;
+      font-size: 0.85rem;
       cursor: pointer;
       transition: all 0.2s ease;
     }
@@ -118,14 +122,14 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 4px;
+      margin-top: 6px;
       text-align: center;
     }
 
     th, td {
       border: 1px solid var(--border-color);
-      padding: 4px 6px;
-      font-size: 0.88rem;
+      padding: 6px 8px;
+      font-size: 0.92rem;
     }
 
     th {
@@ -139,10 +143,10 @@
       color: var(--text-bright);
       border: 1px solid var(--border-color);
       border-radius: 4px;
-      padding: 2px 4px;
-      font-size: 0.85rem;
+      padding: 3px 6px;
+      font-size: 0.9rem;
       text-align: center;
-      width: 48px;
+      width: 52px;
       cursor: pointer;
     }
 
@@ -158,12 +162,12 @@
 
     .result-badge {
       display: inline-block;
-      padding: 4px 10px;
+      padding: 4px 12px;
       border-radius: 14px;
       font-weight: bold;
-      font-size: 0.85rem;
+      font-size: 0.88rem;
       text-align: center;
-      margin-top: 4px;
+      margin-top: 6px;
     }
 
     .badge-tautologia {
@@ -202,7 +206,7 @@
     </div>
 
     <div class="panel" id="table-panel">
-      <div id="formula-title" style="font-size: 0.95rem; text-align: center; font-weight: bold;"></div>
+      <div id="formula-title" style="font-size: 1rem; text-align: center; font-weight: bold;"></div>
       
       <div style="overflow-x: auto;">
         <table id="truth-table">
@@ -211,7 +215,7 @@
       </div>
 
       <div style="text-align: center;">
-        <button class="btn" style="background: var(--accent-green); color: #ffffff; font-weight: bold; margin-top: 4px; padding: 4px 12px;" onclick="checkAnswers()">Verificar Respuestas</button>
+        <button class="btn" style="background: var(--accent-green); color: #ffffff; font-weight: bold; margin-top: 6px; padding: 6px 14px;" onclick="checkAnswers()">Verificar Respuestas</button>
       </div>
 
       <div id="classification-box" style="text-align: center;"></div>
@@ -361,11 +365,11 @@
       if (allCorrect) {
         box.innerHTML = `
           <div class="result-badge ${badgeClass}">${typeText}</div>
-          <p style="margin-top:4px; font-size:0.85rem; color:var(--text-color);">${formulas[currentIdx].exp}</p>
+          <p style="margin-top:4px; font-size:0.88rem; color:var(--text-color);">${formulas[currentIdx].exp}</p>
         `;
       } else {
         box.innerHTML = `
-          <div style="color: var(--accent-red); font-weight: bold; margin-top:4px; font-size:0.85rem;">Algunas celdas son incorrectas. ¡Revisa la precedencia!</div>
+          <div style="color: var(--accent-red); font-weight: bold; margin-top:4px; font-size:0.88rem;">Algunas celdas son incorrectas. ¡Revisa la precedencia!</div>
         `;
       }
     }
