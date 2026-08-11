@@ -48,8 +48,10 @@
   </script>
 
   <style>
-    /* Estilos Armónicos Duales: Modo Claro & Modo Oscuro (NTE-UAN-APK-001 v1.3) */
+    /* Ampliación de Magnitud Vertical del Libro (iCartesiLibri & NTE-UAN-APK-001 v1.3) */
     :root {
+      --pages_container_height: 950px !important;
+      
       /* MODO CLARO (Por defecto) */
       --bg-main: #f8f9fa;
       --page-bg: #ffffff;
@@ -73,6 +75,8 @@
     }
 
     :root[data-theme="dark"], body.dark {
+      --pages_container_height: 950px !important;
+
       /* MODO OSCURO */
       --bg-main: #0d1117;
       --page-bg: #161b22;
@@ -102,6 +106,7 @@
     }
 
     .page {
+      height: var(--pages_container_height) !important;
       background-color: var(--page-bg) !important;
       color: var(--text-color) !important;
       border-color: var(--border-color) !important;
@@ -230,13 +235,13 @@
       color: #e6edf3 !important;
     }
 
-    /* Dimensión vertical optimizada para encajar 100% en la página sin scrollbars */
+    /* AMPLIA MAGNITUD VERTICAL DEL INCRUSTADO (550px) */
     .interactive-frame {
       width: 100%;
-      height: 385px;
+      height: 550px !important;
       border: 1px solid var(--border-color);
       border-radius: 8px;
-      margin: 10px 0 0 0;
+      margin: 12px 0 0 0;
       background: var(--page-bg);
     }
 
@@ -287,20 +292,20 @@
 
       <!-- PORTADA PRINCIPAL DINÁMICA DE TEMA (NTE-UAN-APK-001 v1.3) -->
       <div class="page cover-page" style="margin:0; padding:0; background-size:cover;">
-        <div style="padding: 40px 20px; text-align: center;">
-          <h1 style="font-size: 2.2rem; color: var(--cover-title) !important; margin-bottom: 10px;">Lógica y Conjuntos</h1>
-          <h2 style="font-size: 1.2rem; color: var(--cover-subtitle) !important; font-weight: normal;">Libro Digital Interactivo & Escenas HTML5</h2>
+        <div style="padding: 60px 20px; text-align: center;">
+          <h1 style="font-size: 2.4rem; color: var(--cover-title) !important; margin-bottom: 12px;">Lógica y Conjuntos</h1>
+          <h2 style="font-size: 1.3rem; color: var(--cover-subtitle) !important; font-weight: normal;">Libro Digital Interactivo & Escenas HTML5</h2>
           
-          <div style="margin: 40px 0;">
+          <div style="margin: 50px 0;">
             <img src="images/general/icartesilibri_logo.svg" width="35%" alt="Red Descartes">
           </div>
 
-          <div style="margin-top: 60px; font-size: 0.95rem; color: var(--cover-subtext);">
+          <div style="margin-top: 80px; font-size: 1rem; color: var(--cover-subtext);">
             <p><strong style="color: var(--cover-text);">Dr. Pablo Eduardo Cancino Marentes</strong></p>
             <p style="color: var(--cover-text);">Dr. Sergio Enrique Yarza Acuña</p>
             <p style="margin-top: 15px; color: var(--cover-text);">Universidad Autónoma de Nayarit (UAN)</p>
             <p>Red Educativa Digital Descartes</p>
-            <p style="color: var(--cover-tag); font-size:0.85rem; margin-top:10px; font-weight:bold;">Norma NTE-UAN-APK-001 v1.3 · CBIMAT-215</p>
+            <p style="color: var(--cover-tag); font-size:0.9rem; margin-top:15px; font-weight:bold;">Norma NTE-UAN-APK-001 v1.3 · CBIMAT-215</p>
           </div>
         </div>
       </div>
@@ -354,8 +359,8 @@
 
       <!-- ESCENA INTERACTIVA: TABLAS DE VERDAD -->
       <div class="page">
-        <h2>1.2 Escena Interactiva: Evaluador de Tablas de Verdad</h2>
-        <p style="margin-bottom:6px;">Evaluación paso a paso de tablas de verdad (\(\land, \lor, \neg, \to, \leftrightarrow\)).</p>
+        <h1>1.2 Escena Interactiva — Evaluador de Tablas de Verdad</h1>
+        <p style="margin-bottom:8px;">Evaluación paso a paso de tablas de verdad (\(\land, \lor, \neg, \to, \leftrightarrow\)).</p>
         
         <iframe class="interactive-frame" src="interactivos/tablas_verdad.html" onload="syncIframeTheme(this)"></iframe>
       </div>
@@ -378,8 +383,8 @@
 
       <!-- ESCENA INTERACTIVA: SIMULADOR DE VENN -->
       <div class="page">
-        <h2>2.2 Escena Interactiva: Simulador SVG de Diagramas de Venn</h2>
-        <p style="margin-bottom:6px;">Explora dinámicamente el sombreado de regiones en 2 y 3 conjuntos.</p>
+        <h1>2.2 Escena Interactiva — Simulador SVG de Diagramas de Venn</h1>
+        <p style="margin-bottom:8px;">Explora dinámicamente el sombreado de regiones en 2 y 3 conjuntos.</p>
         
         <iframe class="interactive-frame" src="interactivos/simulador_venn.html" onload="syncIframeTheme(this)"></iframe>
       </div>
@@ -405,7 +410,7 @@
       <div class="page">
         <h1>Capítulo 4 — Evaluación e Interactivos Avanzados</h1>
         <h2>4.1 Evaluador Autocorregible DescartesJS</h2>
-        <p style="margin-bottom:6px;">Módulo de evaluación interactiva basado en los estándares CENEVAL/TNM.</p>
+        <p style="margin-bottom:8px;">Módulo de evaluación interactiva basado en los estándares CENEVAL/TNM.</p>
         
         <iframe class="interactive-frame" src="interactivos/evaluador_descartes.html" onload="syncIframeTheme(this)"></iframe>
       </div>
@@ -413,7 +418,7 @@
       <!-- GEOGEBRA WEB API -->
       <div class="page">
         <h2>4.2 Escena GeoGebra HTML5 Web API</h2>
-        <p style="margin-bottom:6px;">Visualización de construcciones algebraicas y circuitos lógicos.</p>
+        <p style="margin-bottom:8px;">Visualización de construcciones algebraicas y circuitos lógicos.</p>
         
         <iframe class="interactive-frame" src="interactivos/geogebra_logica.html" onload="syncIframeTheme(this)"></iframe>
       </div>
