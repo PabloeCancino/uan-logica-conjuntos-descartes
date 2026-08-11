@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Evaluador Interactivo DescartesJS — Banco CENEVAL/TNM</title>
+
+  <!-- KaTeX -->
+  <link rel="stylesheet" href="../extra/katex/katex.min.css">
+  <script src="../extra/katex/katex.min.js"></script>
+  <script src="../extra/katex/contrib/auto-render.min.js"></script>
+
+  <style>
+    :root {
+      --bg-color: #0d1117;
+      --card-bg: #161b22;
+      --border-color: #30363d;
+      --accent-blue: #58a6ff;
+      --accent-green: #39d353;
+      --accent-red: #f85149;
+      --accent-purple: #bc8cff;
+      --text-color: #c9d1d9;
+      --text-bright: #ffffff;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      margin: 0;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h2 {
+      color: var(--accent-blue);
+      margin-top: 0;
+      margin-bottom: 8px;
+      font-size: 1.3rem;
+      text-align: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 740px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .question-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.9rem;
+      color: #8b949e;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 8px;
+    }
+
+    .question-text {
+      font-size: 1.1rem;
+      color: var(--text-bright);
+      line-height: 1.5;
+    }
+
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .opt-btn {
+      background: #21262d;
+      color: var(--text-color);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 12px 14px;
+      font-size: 0.95rem;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .opt-btn:hover {
+      background: #30363d;
+      border-color: var(--accent-blue);
+    }
+
+    .opt-btn.correct {
+      background: rgba(57, 211, 83, 0.2) !important;
+      border-color: var(--accent-green) !important;
+      color: var(--accent-green) !important;
+    }
+
+    .opt-btn.incorrect {
+      background: rgba(248, 81, 73, 0.2) !important;
+      border-color: var(--accent-red) !important;
+      color: var(--accent-red) !important;
+    }
+
+    .explanation-box {
+      background: #0d1117;
+      border-left: 4px solid var(--accent-purple);
+      border-radius: 0 6px 6px 0;
+      padding: 12px 14px;
+      font-size: 0.95rem;
+      line-height: 1.4;
+      display: none;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .btn-nav {
+      background: var(--accent-blue);
+      color: #000;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .score-badge {
+      background: #21262d;
+      border: 1px solid var(--border-color);
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-weight: bold;
+      color: var(--accent-green);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>📝 Evaluador Autocorregible DescartesJS</h2>
+
+    <div class="card" id="quiz-card">
+      <div class="question-header">
+        <span id="module-tag">Módulo 1 — Lógica Proposicional</span>
+        <span class="score-badge" id="score-tag">Puntaje: 0 / 0</span>
+      </div>
+
+      <div class="question-text" id="q-text">Cargando reactivo...</div>
+
+      <div class="options-grid" id="options-container"></div>
+
+      <div class="explanation-box" id="exp-box">
+        <div style="font-weight:bold; color:var(--accent-purple); margin-bottom:4px;">Explicación Paso a Paso:</div>
+        <div id="exp-text"></div>
+      </div>
+
+      <div class="controls">
+        <div id="q-progress" style="font-size:0.9rem; color:#8b949e;">Pregunta 1 de 5</div>
+        <button class="btn-nav" id="btn-next" onclick="nextQuestion()" style="display:none;">Siguiente Reactivo →</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const sampleQuestions = [
+      {
+        modulo: "Lógica Proposicional",
+        pregunta: "¿Cuál es el valor de verdad del condicional \\(p \\to q\\) cuando el antecedente \\(p\\) es VERDADERO y el consecuente \\(q\\) es FALSO?",
+        opciones: [
+          "Verdadero",
+          "Falso",
+          "Indeterminado",
+          "Tautológico"
+        ],
+        correcta: 1,
+        explicacion: "Un condicional \\(p \\to q\\) es FALSO en un único caso: cuando la premisa \\(p\\) es Verdadera y la conclusión \\(q\\) es Falsa."
+      },
+      {
+        modulo: "Teoría de Conjuntos",
+        pregunta: "Si el conjunto \\(A = \\{1, 2, 3\\}\\), ¿cuál es el cardinal del conjunto potencia \\(|\\mathcal{P}(A)|\\)?",
+        opciones: [
+          "\\(3\\)",
+          "\\(6\\)",
+          "\\(8\\)",
+          "\\(9\\)"
+        ],
+        correcta: 2,
+        explicacion: "El cardinal del conjunto potencia de cualquier conjunto finito con \\(n\\) elementos está dado por \\(|\\mathcal{P}(A)| = 2^n\\). Para \\(n=3\\), \\(2^3 = 8\\)."
+      },
+      {
+        modulo: "Teoría de Conjuntos",
+        pregunta: "Según la 1ª Ley de De Morgan para teoría de conjuntos, ¿a qué es equivalente el complemento de la unión \\((A \\cup B)'\\)?",
+        opciones: [
+          "\\(A' \\cup B'\\)",
+          "\\(A' \\cap B'\\)",
+          "\\(A \\setminus B\\)",
+          "\\((A \\cap B)'\\)"
+        ],
+        correcta: 1,
+        explicacion: "La 1ª Ley de De Morgan establece que \\((A \\cup B)' = A' \\cap B'\\). El complemento invierte la unión en intersección."
+      },
+      {
+        modulo: "Métodos de Demostración",
+        pregunta: "En una demostración por contraposición de \\(P \\Rightarrow Q\\), ¿cuál es la proposición lógicamente equivalente que se demuestra?",
+        opciones: [
+          "\\(Q \\Rightarrow P\\)",
+          "\\(\\neg P \\Rightarrow \\neg Q\\)",
+          "\\(\\neg Q \\Rightarrow \\neg P\\)",
+          "\\(P \\land \\neg Q\\)"
+        ],
+        correcta: 2,
+        explicacion: "La contrapositiva de una implicación \\(P \\Rightarrow Q\\) es \\(\\neg Q \\Rightarrow \\neg P\\). Ambas proposiciones poseen exactamente la misma tabla de verdad."
+      },
+      {
+        modulo: "Métodos de Demostración",
+        pregunta: "¿Cuáles son los dos pasos fundamentales de una prueba por Inducción Matemática para una propiedad \\(P(n)\\)?",
+        opciones: [
+          "Paso Base \\(P(1)\\) y Paso Inductivo \\(P(k) \\Rightarrow P(k+1)\\)",
+          "Demostración directa y contraejemplo",
+          "Suposición de contradicción y reducción al absurdo",
+          "Paso Base \\(P(0)\\) y Paso de Clausura \\(P(n) = 0\\)"
+        ],
+        correcta: 0,
+        explicacion: "La Inducción Matemática exige comprobar el caso base (usualmente \\(n=1\\)) y demostrar que la hipótesis inductiva \\(P(k)\\) implica la validez para \\(P(k+1)\\)."
+      }
+    ];
+
+    let currentQ = 0;
+    let score = 0;
+    let answered = false;
+
+    function renderQuestion() {
+      const q = sampleQuestions[currentQ];
+      answered = false;
+
+      document.getElementById('module-tag').innerText = `Módulo: ${q.modulo}`;
+      document.getElementById('score-tag').innerText = `Puntaje: ${score} / ${sampleQuestions.length}`;
+      document.getElementById('q-text').innerHTML = q.pregunta;
+      document.getElementById('q-progress').innerText = `Pregunta ${currentQ + 1} de ${sampleQuestions.length}`;
+      document.getElementById('btn-next').style.display = 'none';
+      document.getElementById('exp-box').style.display = 'none';
+
+      const container = document.getElementById('options-container');
+      container.innerHTML = '';
+
+      q.opciones.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'opt-btn';
+        btn.innerHTML = `<span style="font-weight:bold; color:var(--accent-blue);">${String.fromCharCode(65 + idx)})</span> <span>${opt}</span>`;
+        btn.onclick = () => selectOption(idx, btn);
+        container.appendChild(btn);
+      });
+
+      renderMathInElement(document.getElementById('quiz-card'));
+    }
+
+    function selectOption(idx, selectedBtn) {
+      if (answered) return;
+      answered = true;
+
+      const q = sampleQuestions[currentQ];
+      const buttons = document.querySelectorAll('.opt-btn');
+
+      if (idx === q.correcta) {
+        selectedBtn.classList.add('correct');
+        score++;
+      } else {
+        selectedBtn.classList.add('incorrect');
+        buttons[q.correcta].classList.add('correct');
+      }
+
+      document.getElementById('score-tag').innerText = `Puntaje: ${score} / ${sampleQuestions.length}`;
+      document.getElementById('exp-text').innerHTML = q.explicacion;
+      document.getElementById('exp-box').style.display = 'block';
+      document.getElementById('btn-next').style.display = 'block';
+
+      renderMathInElement(document.getElementById('exp-box'));
+    }
+
+    function nextQuestion() {
+      if (currentQ < sampleQuestions.length - 1) {
+        currentQ++;
+        renderQuestion();
+      } else {
+        showFinalResults();
+      }
+    }
+
+    function showFinalResults() {
+      const card = document.getElementById('quiz-card');
+      const pct = Math.round((score / sampleQuestions.length) * 100);
+      card.innerHTML = `
+        <div style="text-align:center; padding: 20px;">
+          <h3 style="color:var(--accent-green); font-size:1.5rem; margin-bottom:8px;">¡Evaluación Completada! 🎉</h3>
+          <p style="font-size:1.2rem; color:var(--text-bright);">Tu puntaje final es: <strong>${score} de ${sampleQuestions.length}</strong> (${pct}%)</p>
+          <button class="btn-nav" style="margin-top:16px;" onclick="location.reload()">Reintentar Evaluación</button>
+        </div>
+      `;
+    }
+
+    renderQuestion();
+  </script>
+</body>
+</html>

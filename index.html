@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=yes,minimal-ui">
+	<meta name="mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+	<title>Lógica y Conjuntos — Libro Digital Interactivo (Proyecto Descartes / UAN)</title>
+
+	<!-- Precarga de Logo -->
+	<link rel="preload" as="image" href="images/general/icartesilibri_logo.svg">
+
+	<!-- Configuración del Libro iCartesiLibri -->
+	<script>
+	window.book_config = {
+		auto_numerate_sections_and_figures: true,
+		open_interactives_fullscreen: true,
+	}
+	</script>
+
+  <!-- Núcleo del libro interactivo Descartes -->
+  <script type="text/javascript" src="book-min.js" charset="utf-8"></script>
+  
+  <!-- Estilos y fuentes -->
+  <link rel="stylesheet" href="extra/fonts.css" type="text/css">
+  <link rel="stylesheet" href="extra/style.css" type="text/css">
+
+  <!-- KaTeX (Renderizado Matemático Ultrarrápido) -->
+  <link rel="stylesheet" type="text/css" href="extra/katex/katex.min.css"/>
+  <script src="extra/katex/katex.min.js"></script>
+  <script src="extra/katex/contrib/copy-tex.min.js"></script>
+  <script src="extra/katex/contrib/auto-render.min.js"></script>
+
+  <script>
+  document.addEventListener("DOMContentLoaded", function() {
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: "$$", right: "$$", display: true},
+        {left: "$", right: "$", display: false},
+        {left: "\\[", right: "\\]", display: true},
+        {left: "\\(", right: "\\)", display: false}
+      ]
+    });
+  });
+  </script>
+
+  <style>
+    /* Estilos personalizados NTE-UAN-APK-001 v1.3 */
+    :root {
+      --uan-blue: #004b87;
+      --uan-gold: #c59b27;
+      --descartes-green: #39d353;
+      --font-scale: 1;
+    }
+
+    body {
+      font-size: calc(1rem * var(--font-scale)) !important;
+    }
+
+    .font-scale-controls {
+      position: fixed;
+      bottom: 15px;
+      right: 15px;
+      z-index: 1000;
+      background: rgba(22, 27, 34, 0.9);
+      border: 1px solid #30363d;
+      border-radius: 20px;
+      padding: 4px 8px;
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    }
+
+    .font-btn {
+      background: #21262d;
+      color: #c9d1d9;
+      border: 1px solid #30363d;
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .font-btn:hover {
+      background: #58a6ff;
+      color: #000;
+    }
+
+    .info-note {
+      background: rgba(88, 166, 255, 0.1);
+      border-left: 4px solid #58a6ff;
+      padding: 10px 14px;
+      margin: 12px 0;
+      border-radius: 0 6px 6px 0;
+    }
+
+    .interactive-frame {
+      width: 100%;
+      height: 480px;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      margin: 16px 0;
+    }
+  </style>
+</head>
+
+<body>
+	<div id="book_loader_container">
+		<div id="book_loader"></div>
+		<img src="images/general/icartesilibri_logo.svg" width="20%" style="padding-left:1em;">
+	</div>
+
+  <!-- Controles de Accesibilidad Tipográfica (NTE-UAN-APK-001 §6.4) -->
+  <div class="font-scale-controls">
+    <button class="font-btn" onclick="adjustFont(-0.1)" title="Reducir fuente">A-</button>
+    <span id="font-scale-label" style="font-size:0.8rem; color:#8b949e;">1.00x</span>
+    <button class="font-btn" onclick="adjustFont(0.1)" title="Aumentar fuente">A+</button>
+  </div>
+
+  <div id="book_container">
+    <div id="btn_back_page"></div>
+    <div id="btn_next_page"></div>
+    <button id="go_to_table_of_content"></button>
+    
+    <button id="btn_config"></button>
+    <div id="config_options">
+      <div id="dark_light_mode"></div>
+    </div>
+
+    <div id="table_of_content"></div>
+
+    <div id="pages_container">
+      
+      <!-- Página vacía de guarda -->
+      <div class="page" style="background-color:transparent;"></div>
+
+      <!-- PORTADA PRINCIPAL -->
+      <div class="page invertcolor" style="margin:0; padding:0; background-size:cover; background-image:linear-gradient(135deg, #0d1117 0%, #161b22 100%);">
+        <div style="padding: 40px 20px; text-align: center;">
+          <h1 style="font-size: 2.2rem; color: #58a6ff; margin-bottom: 10px;">Lógica y Conjuntos</h1>
+          <h2 style="font-size: 1.2rem; color: #c59b27; font-weight: normal;">Libro Digital Interactivo & Escenas HTML5</h2>
+          
+          <div style="margin: 40px 0;">
+            <img src="images/general/icartesilibri_logo.svg" width="35%" alt="Red Descartes">
+          </div>
+
+          <div style="margin-top: 60px; font-size: 0.95rem; color: #8b949e;">
+            <p><strong>Dr. Pablo Eduardo Cancino Marentes</strong></p>
+            <p>Dr. Sergio Enrique Yarza Acuña</p>
+            <p style="margin-top: 15px;">Universidad Autónoma de Nayarit (UAN)</p>
+            <p>Red Educativa Digital Descartes</p>
+            <p style="color: #39d353; font-size:0.85rem; margin-top:10px;">Norma NTE-UAN-APK-001 v1.3 · CBIMAT-215</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- PRESENTACIÓN E INTRODUCCIÓN -->
+      <div class="page" init-page-num="true">
+        <h1>Presentación de la Obra</h1>
+        <p>Este <strong>Libro Digital Interactivo</strong> ha sido desarrollado en el marco de la Red Educativa Digital Descartes y la norma técnica <strong>NTE-UAN-APK-001 v1.3</strong> de la Universidad Autónoma de Nayarit.</p>
+        
+        <div class="info-note">
+          <strong>Objetivo Pedagógico:</strong> Proporcionar un recurso de aprendizaje autónomo y dinámico para la asignatura de <em>Lógica y Conjuntos (CBIMAT-215)</em> en la Licenciatura en Matemáticas, integrando teoría rigurosa, notación en KaTeX, simuladores interactivos SVG, applets GeoGebra y evaluadores autocorregibles en formato HTML5 DescartesJS.
+        </div>
+
+        <h3>Estructura del Curso:</h3>
+        <ul>
+          <li><strong>Capítulo 1:</strong> Lógica Proposicional, Conectivas y Tablas de Verdad.</li>
+          <li><strong>Capítulo 2:</strong> Teoría de Conjuntos, Pertenencia y Simulador de Diagramas de Venn.</li>
+          <li><strong>Capítulo 3:</strong> Métodos de Demostración Formal en Matemáticas.</li>
+          <li><strong>Capítulo 4:</strong> Evaluador Autocorregible DescartesJS & GeoGebra API.</li>
+        </ul>
+      </div>
+
+      <!-- CAPÍTULO 1: LÓGICA PROPOSICIONAL -->
+      <div class="page">
+        <h1>Capítulo 1 — Lógica Proposicional</h1>
+        <h2>1.1 Proposiciones Atómicas y Moleculares</h2>
+        <p>Una <strong>proposición</strong> es cualquier enunciado declarativo del cual se pueda afirmar inequívocamente su valor de verdad: verdadero (\(V\)) o falso (\(F\)), pero no ambos a la vez.</p>
+        
+        <table border="1" style="width:100%; border-collapse:collapse; margin:15px 0;">
+          <thead>
+            <tr style="background:#21262d; color:#58a6ff;">
+              <th>Tipo de Proposición</th>
+              <th>Descripción</th>
+              <th>Simbolización</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Atómica</strong></td>
+              <td>Enunciado simple no descomponible.</td>
+              <td>\(p\): "El número 7 es primo"</td>
+            </tr>
+            <tr>
+              <td><strong>Molecular</strong></td>
+              <td>Formada por dos o más atómicas mediante conectivas.</td>
+              <td>\(p \land q\): "7 es primo y 8 es par"</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ESCENA INTERACTIVA: TABLAS DE VERDAD -->
+      <div class="page">
+        <h2>1.2 Escena Interactiva: Evaluador de Tablas de Verdad</h2>
+        <p>Utiliza la siguiente escena interactiva en DescartesJS / HTML5 para evaluar paso a paso las tablas de verdad de las conectivas fundamentales (\(\land, \lor, \neg, \to, \leftrightarrow\)).</p>
+        
+        <!-- Iframe con la escena interactiva -->
+        <iframe class="interactive-frame" src="interactivos/tablas_verdad.html"></iframe>
+      </div>
+
+      <!-- CAPÍTULO 2: TEORÍA DE CONJUNTOS -->
+      <div class="page">
+        <h1>Capítulo 2 — Teoría de Conjuntos</h1>
+        <h2>2.1 Elementos, Notación y Pertenencia</h2>
+        <p>Un <strong>conjunto</strong> es una colección bien definida de objetos llamados <em>elementos</em>. Si un objeto \(a\) pertenece al conjunto \(A\), se denota como \(a \in A\).</p>
+
+        <h3>Operaciones Fundamentales entre Conjuntos:</h3>
+        <ul>
+          <li><strong>Unión (\(A \cup B\)):</strong> \(\{x \mid x \in A \lor x \in B\}\)</li>
+          <li><strong>Intersección (\(A \cap B\)):</strong> \(\{x \mid x \in A \land x \in B\}\)</li>
+          <li><strong>Diferencia (\(A \setminus B\)):</strong> \(\{x \mid x \in A \land x \notin B\}\)</li>
+          <li><strong>Diferencia Simétrica (\(A \Delta B\)):</strong> \((A \setminus B) \cup (B \setminus A)\)</li>
+          <li><strong>Complemento (\(A'\)):</strong> \(\{x \in \mathcal{U} \mid x \notin A\}\)</li>
+        </ul>
+      </div>
+
+      <!-- ESCENA INTERACTIVA: SIMULADOR DE VENN -->
+      <div class="page">
+        <h2>2.2 Escena Interactiva: Simulador SVG de Diagramas de Venn</h2>
+        <p>Explora dinámicamente el sombreado de regiones y la geometría de conjuntos en 2 y 3 dimensiones.</p>
+        
+        <!-- Iframe con el simulador de Venn -->
+        <iframe class="interactive-frame" src="interactivos/simulador_venn.html"></iframe>
+      </div>
+
+      <!-- CAPÍTULO 3: MÉTODOS DE DEMOSTRACIÓN -->
+      <div class="page">
+        <h1>Capítulo 3 — Métodos de Demostración</h1>
+        <h2>3.1 Técnicas Fundamentales de Prueba</h2>
+        <p>Para demostrar la validez de una proposición matemática \(P \Rightarrow Q\), se utilizan principalmente tres técnicas:</p>
+
+        <ol>
+          <li><strong>Prueba Directa:</strong> Se asume la hipótesis \(P\) verdadera y, mediante deducciones lógicas válidas, se concluye la tesis \(Q\).</li>
+          <li><strong>Prueba por Contraposición:</strong> Se demuestra la proposición equivalente \(\neg Q \Rightarrow \neg P\).</li>
+          <li><strong>Prueba por Contradicción (Reducción al Absurdo):</strong> Se asume la negación de la implicación \((P \land \neg Q)\) y se deduce una contradicción lógica \(\bot\).</li>
+        </ol>
+
+        <div class="info-note">
+          <strong>Inducción Matemática:</strong> Para probar que una propiedad \(P(n)\) es válida para todo \(n \in \mathbb{N}\), se verifica el paso base \(P(1)\) y se demuestra que \(P(k) \Rightarrow P(k+1)\).
+        </div>
+      </div>
+
+      <!-- CAPÍTULO 4: EVALUADOR Y GEOGEBRA -->
+      <div class="page">
+        <h1>Capítulo 4 — Evaluación e Interactivos Avanzados</h1>
+        <h2>4.1 Evaluador Autocorregible DescartesJS</h2>
+        <p>Ponte a prueba con este módulo de evaluación interactiva basado en los estándares psicométricos CENEVAL/TNM.</p>
+        
+        <!-- Iframe con el evaluador autocorregible -->
+        <iframe class="interactive-frame" src="interactivos/evaluador_descartes.html"></iframe>
+      </div>
+
+      <!-- GEOGEBRA WEB API -->
+      <div class="page">
+        <h2>4.2 Escena GeoGebra HTML5 Web API</h2>
+        <p>Visualización de construcciones algebraicas y circuitos lógicos incrustados dinámicamente.</p>
+        
+        <!-- Iframe con la escena GeoGebra -->
+        <iframe class="interactive-frame" src="interactivos/geogebra_logica.html"></iframe>
+      </div>
+
+      <!-- PÁGINA DE CRÉDITOS -->
+      <div class="page">
+        <h1>Créditos Institucionales</h1>
+        <div style="margin-top: 30px; line-height: 1.6;">
+          <h3 style="color:#58a6ff;">Universidad Autónoma de Nayarit (UAN)</h3>
+          <p>Unidad Académica de Ciencias Básicas e Ingenierías</p>
+          <p>Licenciatura en Matemáticas · Asignatura: Lógica y Conjuntos (CBIMAT-215)</p>
+          
+          <h3 style="color:#c59b27; margin-top:25px;">Equipo de Investigación Docente</h3>
+          <ul>
+            <li><strong>Dr. Pablo Eduardo Cancino Marentes</strong> — Investigador Responsable / Desarrollo APK y Libro Interactivo</li>
+            <li><strong>Dr. Sergio Enrique Yarza Acuña</strong> — Investigador Colaborador / Diseño Curricular</li>
+            <li><strong>Ayrton Ortega Hernández</strong> — Colaborador Estudiantil (Lic. en Matemáticas)</li>
+            <li><strong>Luis Angel Caro Madera</strong> — Colaborador Estudiantil (Lic. en Matemáticas)</li>
+          </ul>
+
+          <h3 style="color:#39d353; margin-top:25px;">Red Educativa Digital Descartes</h3>
+          <p>Motor de Libro Interactivo HTML5 <em>iCartesiLibri</em> desarrollado por <strong>Joel Espinosa Longi</strong> (IMAT - UNAM).</p>
+          <p style="font-size:0.85rem; color:#8b949e; margin-top:20px;">Todos los derechos reservados © 2026. Norma NTE-UAN-APK-001 v1.3.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // Control de Accesibilidad Tipográfica
+    let currentScale = 1.0;
+    function adjustFont(delta) {
+      currentScale = Math.min(Math.max(0.85, currentScale + delta), 2.0);
+      document.documentElement.style.setProperty('--font-scale', currentScale);
+      document.getElementById('font-scale-label').innerText = currentScale.toFixed(2) + 'x';
+    }
+  </script>
+</body>
+</html>

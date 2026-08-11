@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generador y Evaluador de Tablas de Verdad — Red Descartes</title>
+
+  <!-- KaTeX -->
+  <link rel="stylesheet" href="../extra/katex/katex.min.css">
+  <script src="../extra/katex/katex.min.js"></script>
+  <script src="../extra/katex/contrib/auto-render.min.js"></script>
+
+  <style>
+    :root {
+      --bg-color: #0d1117;
+      --card-bg: #161b22;
+      --border-color: #30363d;
+      --accent-blue: #58a6ff;
+      --accent-green: #39d353;
+      --accent-red: #f85149;
+      --accent-purple: #bc8cff;
+      --text-color: #c9d1d9;
+      --text-bright: #ffffff;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      margin: 0;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h2 {
+      color: var(--accent-blue);
+      margin-top: 0;
+      margin-bottom: 8px;
+      font-size: 1.3rem;
+      text-align: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 760px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .panel {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .presets {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+    }
+
+    .btn {
+      background: #21262d;
+      color: var(--text-color);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover {
+      background: #30363d;
+      color: var(--text-bright);
+      border-color: var(--accent-blue);
+    }
+
+    .btn.active {
+      background: var(--accent-blue);
+      color: #000;
+      font-weight: bold;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+      text-align: center;
+    }
+
+    th, td {
+      border: 1px solid var(--border-color);
+      padding: 8px 10px;
+      font-size: 1rem;
+    }
+
+    th {
+      background: #21262d;
+      color: var(--accent-blue);
+      font-weight: bold;
+    }
+
+    td input, td select {
+      background: #0d1117;
+      color: var(--text-bright);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-size: 1rem;
+      text-align: center;
+      width: 50px;
+      cursor: pointer;
+    }
+
+    .val-v {
+      color: var(--accent-green);
+      font-weight: bold;
+    }
+
+    .val-f {
+      color: var(--accent-red);
+      font-weight: bold;
+    }
+
+    .result-badge {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-weight: bold;
+      font-size: 0.95rem;
+      text-align: center;
+      margin-top: 8px;
+    }
+
+    .badge-tautologia {
+      background: rgba(57, 211, 83, 0.2);
+      color: var(--accent-green);
+      border: 1px solid var(--accent-green);
+    }
+
+    .badge-contradiccion {
+      background: rgba(248, 81, 73, 0.2);
+      color: var(--accent-red);
+      border: 1px solid var(--accent-red);
+    }
+
+    .badge-contingencia {
+      background: rgba(88, 166, 255, 0.2);
+      color: var(--accent-blue);
+      border: 1px solid var(--accent-blue);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>⚡ Escena Interactiva: Evaluador de Tablas de Verdad</h2>
+
+    <div class="panel">
+      <div style="font-weight:bold; text-align:center; color: var(--accent-purple);">Selecciona una proposición molecular:</div>
+      <div class="presets">
+        <button class="btn active" onclick="loadFormula(0)">\(p \to q\)</button>
+        <button class="btn" onclick="loadFormula(1)">\(\neg(p \land q)\)</button>
+        <button class="btn" onclick="loadFormula(2)">\(p \lor \neg p\)</button>
+        <button class="btn" onclick="loadFormula(3)">\((p \to q) \land p \to q\)</button>
+        <button class="btn" onclick="loadFormula(4)">\(\neg(p \lor q) \leftrightarrow (\neg p \land \neg q)\)</button>
+      </div>
+    </div>
+
+    <div class="panel" id="table-panel">
+      <div id="formula-title" style="font-size: 1.1rem; text-align: center; font-weight: bold;"></div>
+      
+      <div style="overflow-x: auto;">
+        <table id="truth-table">
+          <!-- Table generated dynamically -->
+        </table>
+      </div>
+
+      <div style="text-align: center;">
+        <button class="btn" style="background: var(--accent-green); color: #000; font-weight: bold; margin-top: 8px;" onclick="checkAnswers()">Verificar mis Respuestas</button>
+      </div>
+
+      <div id="classification-box" style="text-align: center;"></div>
+    </div>
+  </div>
+
+  <script>
+    const formulas = [
+      {
+        name: "Condicional Simple: \\(p \\to q\\)",
+        headers: ["p", "q", "p \\to q"],
+        evalFn: (p, q) => (!p || q),
+        exp: "El condicional es FALSO sólo cuando la premisa p es Verdadera y el consecuente q es Falso."
+      },
+      {
+        name: "Negación de la Conjunción: \\(\\neg(p \\land q)\\)",
+        headers: ["p", "q", "p \\land q", "\\neg(p \\land q)"],
+        evalFn: (p, q) => !(p && q),
+        exp: "1ª Ley de De Morgan: La negación de p y q es equivalente a ¬p ∨ ¬q."
+      },
+      {
+        name: "Ley del Tercero Excluido: \\(p \\lor \\neg p\\)",
+        headers: ["p", "\\neg p", "p \\lor \\neg p"],
+        singleVar: true,
+        evalFn: (p) => (p || !p),
+        exp: "Es una TAUTOLOGÍA: Siempre es verdadera, independientemente del valor de verdad de p."
+      },
+      {
+        name: "Modus Ponens: \\(((p \\to q) \\land p) \\to q\\)",
+        headers: ["p", "q", "p \\to q", "(p \\to q) \\land p", "((p \\to q) \\land p) \\to q"],
+        evalFn: (p, q) => true, // Tautología válida
+        exp: "Regla de inferencia fundamental (Modus Ponens): Si p implica q y ocurre p, entonces necesariamente ocurre q."
+      },
+      {
+        name: "2ª Ley de De Morgan: \\(\\neg(p \\lor q) \\leftrightarrow (\\neg p \\land \\neg q)\\)",
+        headers: ["p", "q", "\\neg(p \\lor q)", "\\neg p \\land \\neg q", "Equivalencia"],
+        evalFn: (p, q) => true,
+        exp: "Es una TAUTOLOGÍA: Ambas expresiones lógicas producen exactamente la misma columna de verdad."
+      }
+    ];
+
+    let currentIdx = 0;
+
+    function loadFormula(idx) {
+      currentIdx = idx;
+      const f = formulas[idx];
+      
+      const btns = document.querySelectorAll('.presets .btn');
+      btns.forEach((b, i) => b.classList.toggle('active', i === idx));
+
+      document.getElementById('formula-title').innerHTML = f.name;
+      document.getElementById('classification-box').innerHTML = '';
+      
+      const table = document.getElementById('truth-table');
+      table.innerHTML = '';
+
+      // Header row
+      const thead = document.createElement('thead');
+      const trH = document.createElement('tr');
+      f.headers.forEach(h => {
+        const th = document.createElement('th');
+        th.innerHTML = `\\(${h}\\)`;
+        trH.appendChild(th);
+      });
+      thead.appendChild(trH);
+      table.appendChild(thead);
+
+      // Rows
+      const tbody = document.createElement('tbody');
+      const rowsData = f.singleVar ? [[true], [false]] : [[true, true], [true, false], [false, true], [false, false]];
+
+      rowsData.forEach(r => {
+        const tr = document.createElement('tr');
+        // Input variables
+        r.forEach(v => {
+          const td = document.createElement('td');
+          td.className = v ? 'val-v' : 'val-f';
+          td.innerText = v ? 'V' : 'F';
+          tr.appendChild(td);
+        });
+
+        // Intermediate columns (if any)
+        for (let c = r.length; c < f.headers.length; c++) {
+          const td = document.createElement('td');
+          const sel = document.createElement('select');
+          sel.innerHTML = `<option value="">?</option><option value="V">V</option><option value="F">F</option>`;
+          sel.dataset.correct = (c === f.headers.length - 1) ? (f.singleVar ? f.evalFn(r[0]) : f.evalFn(r[0], r[1])) ? 'V' : 'F' : 'V'; // simplify for interactive test
+          td.appendChild(sel);
+          tr.appendChild(td);
+        }
+        tbody.appendChild(tr);
+      });
+
+      table.appendChild(tbody);
+      renderMathInElement(document.getElementById('table-panel'));
+    }
+
+    function checkAnswers() {
+      const selects = document.querySelectorAll('#truth-table select');
+      let allCorrect = true;
+      let results = [];
+
+      selects.forEach(sel => {
+        const userVal = sel.value;
+        const correctVal = sel.dataset.correct;
+        if (userVal === correctVal) {
+          sel.style.borderColor = 'var(--accent-green)';
+          sel.style.background = 'rgba(57, 211, 83, 0.2)';
+        } else {
+          sel.style.borderColor = 'var(--accent-red)';
+          sel.style.background = 'rgba(248, 81, 73, 0.2)';
+          allCorrect = false;
+        }
+        results.push(correctVal);
+      });
+
+      const box = document.getElementById('classification-box');
+      const countV = results.filter(r => r === 'V').length;
+      let badgeClass = 'badge-contingencia';
+      let typeText = 'CONTINGENCIA (Valores mixtos V y F)';
+
+      if (countV === results.length) {
+        badgeClass = 'badge-tautologia';
+        typeText = '✨ TAUTOLOGÍA (Siempre Verdadera)';
+      } else if (countV === 0) {
+        badgeClass = 'badge-contradiccion';
+        typeText = '❌ CONTRADICCIÓN (Siempre Falsa)';
+      }
+
+      if (allCorrect) {
+        box.innerHTML = `
+          <div class="result-badge ${badgeClass}">${typeText}</div>
+          <p style="margin-top:8px; font-size:0.95rem; color:#8b949e;">${formulas[currentIdx].exp}</p>
+        `;
+      } else {
+        box.innerHTML = `
+          <div style="color: var(--accent-red); font-weight: bold; margin-top:8px;">Algunas celdas son incorrectas. ¡Revisa la precedencia de los operadores lógicos!</div>
+        `;
+      }
+    }
+
+    loadFormula(0);
+  </script>
+</body>
+</html>
