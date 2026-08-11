@@ -72,11 +72,11 @@
       --cover-tag: #1a7f37;
     }
 
-    :root[data-theme="dark"] {
+    :root[data-theme="dark"], body.dark {
       /* MODO OSCURO */
       --bg-main: #0d1117;
       --page-bg: #161b22;
-      --text-color: #c9d1d9;
+      --text-color: #e6edf3;
       --title-color: #58a6ff;
       --subtitle-color: #f0883e;
       --border-color: #30363d;
@@ -89,7 +89,7 @@
       --cover-bg: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
       --cover-title: #58a6ff;
       --cover-subtitle: #c59b27;
-      --cover-text: #c9d1d9;
+      --cover-text: #e6edf3;
       --cover-subtext: #8b949e;
       --cover-tag: #39d353;
     }
@@ -108,51 +108,62 @@
       transition: background-color 0.3s ease, color 0.3s ease;
     }
 
-    /* REGLAS EXPLÍCITAS DE CONTRASTE TIPOGRÁFICO PARA EL INTERIOR DEL LIBRO */
-    :root[data-theme="dark"] .page p,
-    :root[data-theme="dark"] .page li,
-    :root[data-theme="dark"] .page td,
-    :root[data-theme="dark"] .page th,
-    :root[data-theme="dark"] .page div,
-    :root[data-theme="dark"] .page span,
-    :root[data-theme="dark"] .page strong,
-    :root[data-theme="dark"] .page em,
-    :root[data-theme="dark"] .page ol,
-    :root[data-theme="dark"] .page ul {
-      color: #c9d1d9 !important;
+    /* REGLAS ABSOLUTAS DE ALTO CONTRASTE TIPOGRÁFICO (Soporta body.dark y data-theme="dark") */
+    body.dark .page,
+    body.dark .page p,
+    body.dark .page li,
+    body.dark .page td,
+    body.dark .page th,
+    body.dark .page div,
+    body.dark .page span,
+    body.dark .page strong,
+    body.dark .page em,
+    body.dark .page ol,
+    body.dark .page ul,
+    body.dark .page figcaption,
+    [data-theme="dark"] .page p,
+    [data-theme="dark"] .page li,
+    [data-theme="dark"] .page td,
+    [data-theme="dark"] .page th,
+    [data-theme="dark"] .page div,
+    [data-theme="dark"] .page span,
+    [data-theme="dark"] .page strong,
+    [data-theme="dark"] .page em,
+    [data-theme="dark"] .page ol,
+    [data-theme="dark"] .page ul {
+      color: #e6edf3 !important;
     }
 
-    :root[data-theme="light"] .page p,
-    :root[data-theme="light"] .page li,
-    :root[data-theme="light"] .page td,
-    :root[data-theme="light"] .page th,
-    :root[data-theme="light"] .page div,
-    :root[data-theme="light"] .page span,
-    :root[data-theme="light"] .page strong,
-    :root[data-theme="light"] .page em,
-    :root[data-theme="light"] .page ol,
-    :root[data-theme="light"] .page ul {
+    body:not(.dark)[data-theme="light"] .page p,
+    body:not(.dark)[data-theme="light"] .page li,
+    body:not(.dark)[data-theme="light"] .page td,
+    body:not(.dark)[data-theme="light"] .page th,
+    body:not(.dark)[data-theme="light"] .page div,
+    body:not(.dark)[data-theme="light"] .page span,
+    body:not(.dark)[data-theme="light"] .page strong,
+    body:not(.dark)[data-theme="light"] .page em,
+    body:not(.dark)[data-theme="light"] .page ol,
+    body:not(.dark)[data-theme="light"] .page ul {
       color: #1f2328 !important;
     }
 
     /* Fórmulas matemáticas KaTeX */
-    :root[data-theme="dark"] .katex,
-    :root[data-theme="dark"] .katex-display {
+    body.dark .katex,
+    body.dark .katex-display,
+    [data-theme="dark"] .katex,
+    [data-theme="dark"] .katex-display {
       color: #f0f6fc !important;
     }
 
-    :root[data-theme="light"] .katex,
-    :root[data-theme="light"] .katex-display {
+    body:not(.dark)[data-theme="light"] .katex,
+    body:not(.dark)[data-theme="light"] .katex-display {
       color: #0f172a !important;
     }
 
     /* Enlaces */
-    :root[data-theme="dark"] .page a {
+    body.dark .page a,
+    [data-theme="dark"] .page a {
       color: #58a6ff !important;
-    }
-
-    :root[data-theme="light"] .page a {
-      color: #0969da !important;
     }
 
     /* Encabezados */
@@ -210,9 +221,12 @@
       border-left-width: 4px;
     }
 
-    :root[data-theme="dark"] .info-note,
-    :root[data-theme="dark"] .info-note strong,
-    :root[data-theme="dark"] .info-note em {
+    body.dark .info-note,
+    body.dark .info-note strong,
+    body.dark .info-note em,
+    [data-theme="dark"] .info-note,
+    [data-theme="dark"] .info-note strong,
+    [data-theme="dark"] .info-note em {
       color: #e6edf3 !important;
     }
 
@@ -463,6 +477,27 @@
         iframeEl.contentWindow?.postMessage({ type: 'THEME_CHANGE', theme: currentTheme }, '*');
       } catch(e) {}
     }
+
+    // Observer para sincronizar si el usuario cambia el tema usando el botón de engranaje ⚙️ nativo de iCartesiLibri
+    document.addEventListener("DOMContentLoaded", function() {
+      const bodyObserver = new MutationObserver(() => {
+        const isDark = document.body.classList.contains('dark');
+        const theme = isDark ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', theme);
+        currentTheme = theme;
+        
+        const btnIcon = document.getElementById('theme-icon');
+        const btnText = document.getElementById('theme-text');
+        if (btnIcon && btnText) {
+          btnIcon.innerText = isDark ? '☀️' : '🌙';
+          btnText.innerText = isDark ? 'Modo Claro' : 'Modo Oscuro';
+        }
+
+        broadcastThemeToIframes(theme);
+      });
+
+      bodyObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+    });
 
     // Control de Accesibilidad Tipográfica
     let currentScale = 1.0;
