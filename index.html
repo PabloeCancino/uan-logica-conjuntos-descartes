@@ -108,7 +108,7 @@
       transition: background-color 0.3s ease, color 0.3s ease;
     }
 
-    /* REGLAS ABSOLUTAS DE ALTO CONTRASTE TIPOGRÁFICO (Soporta body.dark y data-theme="dark") */
+    /* REGLAS ABSOLUTAS DE ALTO CONTRASTE TIPOGRÁFICO */
     body.dark .page,
     body.dark .page p,
     body.dark .page li,
@@ -230,12 +230,13 @@
       color: #e6edf3 !important;
     }
 
+    /* Dimensión vertical optimizada para encajar 100% en la página sin scrollbars */
     .interactive-frame {
       width: 100%;
-      height: 490px;
+      height: 385px;
       border: 1px solid var(--border-color);
       border-radius: 8px;
-      margin: 16px 0;
+      margin: 10px 0 0 0;
       background: var(--page-bg);
     }
 
@@ -354,7 +355,7 @@
       <!-- ESCENA INTERACTIVA: TABLAS DE VERDAD -->
       <div class="page">
         <h2>1.2 Escena Interactiva: Evaluador de Tablas de Verdad</h2>
-        <p>Utiliza la siguiente escena interactiva en DescartesJS / HTML5 para evaluar paso a paso las tablas de verdad de las conectivas fundamentales (\(\land, \lor, \neg, \to, \leftrightarrow\)).</p>
+        <p style="margin-bottom:6px;">Evaluación paso a paso de tablas de verdad (\(\land, \lor, \neg, \to, \leftrightarrow\)).</p>
         
         <iframe class="interactive-frame" src="interactivos/tablas_verdad.html" onload="syncIframeTheme(this)"></iframe>
       </div>
@@ -378,7 +379,7 @@
       <!-- ESCENA INTERACTIVA: SIMULADOR DE VENN -->
       <div class="page">
         <h2>2.2 Escena Interactiva: Simulador SVG de Diagramas de Venn</h2>
-        <p>Explora dinámicamente el sombreado de regiones y la geometría de conjuntos en 2 y 3 dimensiones.</p>
+        <p style="margin-bottom:6px;">Explora dinámicamente el sombreado de regiones en 2 y 3 conjuntos.</p>
         
         <iframe class="interactive-frame" src="interactivos/simulador_venn.html" onload="syncIframeTheme(this)"></iframe>
       </div>
@@ -404,7 +405,7 @@
       <div class="page">
         <h1>Capítulo 4 — Evaluación e Interactivos Avanzados</h1>
         <h2>4.1 Evaluador Autocorregible DescartesJS</h2>
-        <p>Ponte a prueba con este módulo de evaluación interactiva basado en los estándares psicométricos CENEVAL/TNM.</p>
+        <p style="margin-bottom:6px;">Módulo de evaluación interactiva basado en los estándares CENEVAL/TNM.</p>
         
         <iframe class="interactive-frame" src="interactivos/evaluador_descartes.html" onload="syncIframeTheme(this)"></iframe>
       </div>
@@ -412,7 +413,7 @@
       <!-- GEOGEBRA WEB API -->
       <div class="page">
         <h2>4.2 Escena GeoGebra HTML5 Web API</h2>
-        <p>Visualización de construcciones algebraicas y circuitos lógicos incrustados dinámicamente.</p>
+        <p style="margin-bottom:6px;">Visualización de construcciones algebraicas y circuitos lógicos.</p>
         
         <iframe class="interactive-frame" src="interactivos/geogebra_logica.html" onload="syncIframeTheme(this)"></iframe>
       </div>
@@ -478,7 +479,6 @@
       } catch(e) {}
     }
 
-    // Observer para sincronizar si el usuario cambia el tema usando el botón de engranaje ⚙️ nativo de iCartesiLibri
     document.addEventListener("DOMContentLoaded", function() {
       const bodyObserver = new MutationObserver(() => {
         const isDark = document.body.classList.contains('dark');
