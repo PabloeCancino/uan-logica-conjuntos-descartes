@@ -338,12 +338,12 @@
           <strong>Objetivo Pedagógico:</strong> Proporcionar un recurso de aprendizaje autónomo y dinámico para la asignatura de <em>Lógica y Conjuntos (CBIMAT-215)</em> en la Licenciatura en Matemáticas, integrando teoría rigurosa, notación en KaTeX, simuladores interactivos SVG, applets GeoGebra y evaluadores autocorregibles en formato HTML5 DescartesJS.
         </div>
 
-        <h3>Estructura del Curso:</h3>
+        <h3>Estructura del Libro Interactivo:</h3>
         <ul>
-          <li><strong>Capítulo 1:</strong> Lógica Proposicional, Conectivas y Tablas de Verdad.</li>
-          <li><strong>Capítulo 2:</strong> Teoría de Conjuntos, Pertenencia y Simulador de Diagramas de Venn.</li>
-          <li><strong>Capítulo 3:</strong> Métodos de Demostración Formal en Matemáticas.</li>
-          <li><strong>Capítulo 4:</strong> Evaluador Autocorregible DescartesJS & GeoGebra API.</li>
+          <li><strong>Capítulo 1:</strong> Lógica Proposicional, Conectivas y Evaluador de Tablas de Verdad.</li>
+          <li><strong>Capítulo 2:</strong> Teoría de Conjuntos, Álgebra Booleana y Simulador SVG de Diagramas de Venn (19 operaciones).</li>
+          <li><strong>Capítulo 3:</strong> Métodos de Demostración Formal y Simulador de Demostraciones Paso a Paso.</li>
+          <li><strong>Capítulo 4:</strong> Banco de Evaluación Autocorregible DescartesJS (24 reactivos) y GeoGebra API.</li>
         </ul>
       </div>
 
@@ -423,6 +423,14 @@
         <div class="info-note">
           <strong>Inducción Matemática:</strong> Para probar que una propiedad \(P(n)\) es válida para todo \(n \in \mathbb{N}\), se verifica el paso base \(P(1)\) y se demuestra que \(P(k) \Rightarrow P(k+1)\).
         </div>
+      </div>
+
+      <!-- ESCENA INTERACTIVA: SIMULADOR DE DEMOSTRACIONES -->
+      <div class="page">
+        <h1>3.2 Escena Interactiva — Simulador de Demostraciones</h1>
+        <p style="margin-bottom:8px;">Deducción lógica formal paso a paso con justificaciones axiomáticas y notación KaTeX.</p>
+        
+        <iframe class="interactive-frame" src="interactivos/simulador_demostraciones.html" onload="syncIframeTheme(this)"></iframe>
       </div>
 
       <!-- CAPÍTULO 4: EVALUADOR Y GEOGEBRA -->

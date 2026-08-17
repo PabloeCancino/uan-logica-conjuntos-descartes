@@ -65,21 +65,19 @@
       transition: background-color 0.3s ease, color 0.3s ease;
     }
 
-    /* TÍTULO INTERIOR COMPACTO DE MENOR TAMAÑO */
     h2 {
       color: var(--accent-color);
       margin-top: 0;
       margin-bottom: 4px;
-      font-size: 0.85rem;
+      font-size: 0.88rem;
       text-transform: uppercase;
       letter-spacing: 0.5px;
       text-align: center;
-      opacity: 0.9;
     }
 
     .container {
       width: 100%;
-      max-width: 760px;
+      max-width: 780px;
       display: flex;
       flex-direction: column;
       gap: 8px;
@@ -88,7 +86,7 @@
     .controls-panel {
       background: var(--card-bg);
       border: 1px solid var(--border-color);
-      border-radius: 6px;
+      border-radius: 8px;
       padding: 6px 8px;
       display: flex;
       flex-wrap: wrap;
@@ -100,9 +98,9 @@
       background: var(--btn-bg);
       color: var(--text-color);
       border: 1px solid var(--border-color);
-      border-radius: 4px;
+      border-radius: 6px;
       padding: 5px 10px;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       cursor: pointer;
       transition: all 0.2s ease;
       display: flex;
@@ -123,15 +121,10 @@
       border-color: var(--accent-color);
     }
 
-    .btn-mode {
-      background: var(--accent-color);
-      color: #ffffff;
-    }
-
     .venn-card {
       background: var(--card-bg);
       border: 1px solid var(--border-color);
-      border-radius: 6px;
+      border-radius: 8px;
       padding: 12px;
       display: flex;
       flex-direction: column;
@@ -139,77 +132,72 @@
       position: relative;
     }
 
-    /* AMPLIA MAGNITUD VERTICAL DEL GRÁFICO SVG (280px) */
     svg {
       max-width: 100%;
-      height: 280px;
+      height: 290px;
+      user-select: none;
     }
 
     .venn-region {
       cursor: pointer;
-      transition: fill 0.3s ease, stroke 0.3s ease;
+      transition: fill 0.25s ease, stroke 0.25s ease;
     }
 
     .venn-region:hover {
-      opacity: 0.85;
-      stroke-width: 2.5px;
+      filter: brightness(1.2);
     }
 
     .info-box {
+      margin-top: 8px;
       width: 100%;
       background: var(--info-bg);
-      border-left: 4px solid var(--accent-color);
-      border-radius: 0 4px 4px 0;
+      border: 1px solid var(--accent-color);
+      border-radius: 6px;
       padding: 8px 12px;
       box-sizing: border-box;
-      margin-top: 10px;
-      border: 1px solid var(--border-color);
-      border-left-width: 4px;
+      text-align: center;
     }
 
     .info-title {
       font-weight: bold;
+      font-size: 0.95rem;
       color: var(--accent-color);
       margin-bottom: 2px;
-      font-size: 0.95rem;
     }
 
     .katex-formula {
-      font-size: 1.1rem;
-      color: var(--text-bright);
+      font-size: 1.05rem;
       margin: 4px 0;
+      color: var(--text-bright);
     }
 
     .explanation {
-      font-size: 0.88rem;
-      line-height: 1.4;
+      font-size: 0.82rem;
       color: var(--text-color);
+      line-height: 1.35;
     }
   </style>
 </head>
 <body>
 
   <div class="container">
-    <h2>🧪 Escena Interactiva: Diagrama de Venn (DescartesJS HTML5)</h2>
-    
+    <h2>🔵 Simulador Interactivo de Diagramas de Venn & Operaciones Booleanas</h2>
+
     <div class="controls-panel">
-      <button class="btn btn-mode" id="btn-toggle-sets">Cambiar a 3 Conjuntos (A, B, C)</button>
-      <button class="btn btn-mode" id="btn-reset">Limpiar Todo</button>
+      <button class="btn active" id="btn-toggle-sets">Cambiar a 3 Conjuntos (A, B, C)</button>
+      <button class="btn" id="btn-reset">↺ Limpiar Regiones</button>
     </div>
 
-    <div class="controls-panel" id="op-buttons">
-      <!-- Dynamic Buttons -->
-    </div>
+    <!-- Botones de Operaciones Predeterminadas -->
+    <div class="controls-panel" id="op-buttons"></div>
 
     <div class="venn-card">
-      <svg id="venn-svg" viewBox="0 0 500 320">
-        <!-- SVG content generated dynamically -->
-      </svg>
+      <svg id="venn-svg" viewBox="0 0 500 320"></svg>
 
       <div class="info-box">
-        <div class="info-title" id="info-title">Operación Seleccionada</div>
+        <div class="info-title" id="info-title">Unión A ∪ B</div>
         <div class="katex-formula" id="info-formula">\(A \cup B\)</div>
-        <div class="explanation" id="info-exp">Haz clic en los botones superiores o directamente en las regiones del diagrama para explorar la notación de conjuntos.</div>
+        <div class="explanation" id="info-exp">Elementos que pertenecen a A, a B o a ambos.</div>
       </div>
     </div>
   </div>
@@ -218,6 +206,7 @@
     let mode3Sets = false;
     let activeRegions = new Set();
     let currentTheme = 'light';
+    let currentOpId = 'union';
 
     function applyTheme(theme) {
       currentTheme = theme;
@@ -238,21 +227,30 @@
       }
     } catch(e) {}
 
+    // ── CATÁLOGO EXTENDIDO DE OPERACIONES (19 OPERACIONES) ─────────────────
     const presetOps2 = [
       { id: 'union', label: 'A ∪ B', formula: 'A \\cup B', regions: ['rA', 'rB', 'rAB'], exp: 'Unión: Elementos que pertenecen a A, a B o a ambos.' },
       { id: 'inter', label: 'A ∩ B', formula: 'A \\cap B', regions: ['rAB'], exp: 'Intersección: Elementos comunes que pertenecen simultáneamente a A y a B.' },
-      { id: 'diffA', label: 'A \\ B', formula: 'A \\setminus B', regions: ['rA'], exp: 'Diferencia A - B: Elementos que pertenecen a A pero NO a B.' },
-      { id: 'diffB', label: 'B \\ A', formula: 'B \\setminus A', regions: ['rB'], exp: 'Diferencia B - A: Elementos que pertenecen a B pero NO a A.' },
-      { id: 'symdiff', label: 'A Δ B', formula: 'A \\Delta B', regions: ['rA', 'rB'], exp: 'Diferencia Simétrica: Elementos que pertenecen a A o a B, pero NO a ambos.' },
-      { id: 'compA', label: "A'", formula: "A'", regions: ['rB', 'rU'], exp: "Complemento de A: Elementos del conjunto Universal que NO pertenecen a A." },
-      { id: 'demorgan1', label: "(A ∪ B)'", formula: "(A \\cup B)'", regions: ['rU'], exp: "1ª Ley de De Morgan: El complemento de la unión es la intersección de los complementos." },
+      { id: 'diffA', label: 'A \\ B', formula: 'A \\setminus B', regions: ['rA'], exp: 'Diferencia A \\ B: Elementos que pertenecen exclusivamente a A y no a B.' },
+      { id: 'diffB', label: 'B \\ A', formula: 'B \\setminus A', regions: ['rB'], exp: 'Diferencia B \\ A: Elementos que pertenecen exclusivamente a B y no a A.' },
+      { id: 'symdiff', label: 'A Δ B', formula: 'A \\Delta B = (A \\setminus B) \\cup (B \\setminus A)', regions: ['rA', 'rB'], exp: 'Diferencia Simétrica: Elementos que pertenecen a A o a B, pero NO a ambos.' },
+      { id: 'compA', label: "Aᶜ", formula: "A^c = \\mathcal{U} \\setminus A", regions: ['rB', 'rExterior'], exp: "Complemento de A: Todo el universo fuera del círculo A (Solo B + Exterior)." },
+      { id: 'compB', label: "Bᶜ", formula: "B^c = \\mathcal{U} \\setminus B", regions: ['rA', 'rExterior'], exp: "Complemento de B: Todo el universo fuera del círculo B (Solo A + Exterior)." },
+      { id: 'demorgan1', label: "(A ∪ B)ᶜ", formula: "(A \\cup B)^c = A^c \\cap B^c", regions: ['rExterior'], exp: "1ª Ley de De Morgan: El complemento de la unión deja iluminada únicamente la región exterior a ambos círculos." },
+      { id: 'demorgan2', label: "(A ∩ B)ᶜ", formula: "(A \\cap B)^c = A^c \\cup B^c", regions: ['rA', 'rB', 'rExterior'], exp: "2ª Ley de De Morgan: Todo el universo excepto la intersección central." },
     ];
 
     const presetOps3 = [
-      { id: 'union3', label: 'A ∪ B ∪ C', formula: 'A \\cup B \\cup C', regions: ['rA', 'rB', 'rC', 'rAB', 'rAC', 'rBC', 'rABC'], exp: 'Unión de tres conjuntos: Elementos presentes en al menos uno de los tres conjuntos.' },
+      { id: 'union3', label: 'A ∪ B ∪ C', formula: 'A \\cup B \\cup C', regions: ['rA', 'rB', 'rC', 'rAB', 'rAC', 'rBC', 'rABC'], exp: 'Unión de 3 conjuntos: Elementos presentes en al menos uno de los tres conjuntos.' },
       { id: 'inter3', label: 'A ∩ B ∩ C', formula: 'A \\cap B \\cap C', regions: ['rABC'], exp: 'Intersección triple: Elementos comunes a los tres conjuntos A, B y C simultáneamente.' },
-      { id: 'distrib', label: 'A ∩ (B ∪ C)', formula: 'A \\cap (B \\cup C)', regions: ['rAB', 'rAC', 'rABC'], exp: 'Propiedad Distributiva: Intersección de A con la unión de B y C.' },
-      { id: 'onlyA', label: 'A \\ (B ∪ C)', formula: 'A \\setminus (B \\cup C)', regions: ['rA'], exp: 'Elementos exclusivos de A (ningún elemento en B ni en C).' },
+      { id: 'distrib', label: 'A ∩ (B ∪ C)', formula: 'A \\cap (B \\cup C) = (A \\cap B) \\cup (A \\cap C)', regions: ['rAB', 'rAC', 'rABC'], exp: 'Ley Distributiva: Intersección de A con la unión de B y C.' },
+      { id: 'onlyA', label: 'A \\ (B ∪ C)', formula: 'A \\setminus (B \\cup C)', regions: ['rA'], exp: 'Exclusivo de A: Elementos pertenecientes únicamente a A y a ningún otro conjunto.' },
+      { id: 'onlyB', label: 'B \\ (A ∪ C)', formula: 'B \\setminus (A \\cup C)', regions: ['rB'], exp: 'Exclusivo de B: Elementos pertenecientes únicamente a B.' },
+      { id: 'onlyC', label: 'C \\ (A ∪ B)', formula: 'C \\setminus (A \\cup B)', regions: ['rC'], exp: 'Exclusivo de C: Elementos pertenecientes únicamente a C.' },
+      { id: 'compUnion3', label: "(A ∪ B ∪ C)ᶜ", formula: "(A \\cup B \\cup C)^c", regions: ['rExterior3'], exp: "Complemento de la unión triple: Región exterior sin incluir ningún círculo." },
+      { id: 'exacto2', label: 'Exactamente 2', formula: '(A \\cap B \\setminus C) \\cup (A \\cap C \\setminus B) \\cup (B \\cap C \\setminus A)', regions: ['rAB', 'rAC', 'rBC'], exp: 'Elementos que pertenecen exactamente a dos conjuntos pero no al tercero.' },
+      { id: 'exacto1', label: 'Exactamente 1', formula: 'Solo A \\cup Solo B \\cup Solo C', regions: ['rA', 'rB', 'rC'], exp: 'Elementos que pertenecen a exactamente un solo conjunto.' },
+      { id: 'c3_demorgan', label: '(A ∩ B ∩ C)ᶜ', formula: '(A \\cap B \\cap C)^c', regions: ['rA', 'rB', 'rC', 'rAB', 'rAC', 'rBC', 'rExterior3'], exp: 'Complemento de la intersección triple: Todo el universo excepto el núcleo central compartido.' },
     ];
 
     function renderButtons() {
@@ -262,8 +260,8 @@
 
       list.forEach(op => {
         const btn = document.createElement('button');
-        btn.className = 'btn';
-        btn.innerHTML = `<span>\\(${op.formula}\\)</span>`;
+        btn.className = `btn ${currentOpId === op.id ? 'active' : ''}`;
+        btn.innerHTML = `<span>\\(${op.formula.split('=')[0].trim()}\\)</span>`;
         btn.onclick = () => applyPreset(op);
         container.appendChild(btn);
       });
@@ -272,23 +270,27 @@
     }
 
     function applyPreset(op) {
+      currentOpId = op.id;
       activeRegions = new Set(op.regions);
       document.getElementById('info-title').innerText = op.label;
       document.getElementById('info-formula').innerHTML = `\\(${op.formula}\\)`;
       document.getElementById('info-exp').innerText = op.exp;
       renderMathInElement(document.getElementById('info-formula'));
+      renderButtons();
       updateSVG();
     }
 
     function toggleRegion(regId) {
+      currentOpId = null;
       if (activeRegions.has(regId)) {
         activeRegions.delete(regId);
       } else {
         activeRegions.add(regId);
       }
-      document.getElementById('info-title').innerText = 'Región Seleccionada Manualmente';
-      document.getElementById('info-formula').innerText = `Modo Interactivo (Regiones activas: ${activeRegions.size})`;
-      document.getElementById('info-exp').innerText = 'Has personalizado la región sombreada directamente en el gráfico SVG.';
+      document.getElementById('info-title').innerText = 'Exploración Manual de Regiones';
+      document.getElementById('info-formula').innerText = `Regiones activas seleccionadas: ${activeRegions.size}`;
+      document.getElementById('info-exp').innerText = 'Haz clic en cualquier región atómica del diagrama SVG para activar o desactivar su sombreado.';
+      renderButtons();
       updateSVG();
     }
 
@@ -303,6 +305,7 @@
       const colorA = isDark ? '88,166,255' : '9,105,218';
       const colorB = isDark ? '57,211,83' : '26,127,55';
       const colorAB = isDark ? '188,140,255' : '130,80,223';
+      const colorExt = isDark ? '240,136,62' : '207,34,46';
 
       svg.innerHTML = `
         <defs>
@@ -317,33 +320,49 @@
           <mask id="mask-inter">
             <circle cx="310" cy="160" r="100" fill="white" />
           </mask>
+          <!-- MÁSCARA EXTERIOR 2 CONJUNTOS (Recorta los 2 círculos con 100% de transparencia interior) -->
+          <mask id="maskExterior2">
+            <rect x="0" y="0" width="500" height="320" fill="white" />
+            <circle cx="190" cy="160" r="100" fill="black" />
+            <circle cx="310" cy="160" r="100" fill="black" />
+          </mask>
         </defs>
 
-        <rect id="rU" class="venn-region" x="20" y="20" width="460" height="280" rx="10" 
-              fill="${activeRegions.has('rU') ? `rgba(${colorA},0.35)` : uFill}" 
-              stroke="${uStroke}" stroke-width="2" onclick="toggleRegion('rU')"/>
-        <text x="35" y="45" fill="${uText}" font-size="18" font-weight="bold">U</text>
+        <!-- Fondo del Universo -->
+        <rect x="15" y="15" width="470" height="290" rx="12" fill="${uFill}" stroke="${uStroke}" stroke-width="2" />
+        <text x="35" y="45" fill="${uText}" font-size="18" font-weight="bold">𝒰</text>
 
-        <circle id="rA" class="venn-region" cx="190" cy="160" r="100" 
+        <!-- Región Exterior (Complemento de la unión) -->
+        <rect class="venn-region" x="15" y="15" width="470" height="290" rx="12"
+              mask="url(#maskExterior2)"
+              fill="${activeRegions.has('rExterior') ? `rgba(${colorExt}, 0.45)` : 'transparent'}"
+              onclick="toggleRegion('rExterior')" />
+
+        <!-- Región Solo A -->
+        <circle id="rA" class="venn-region" cx="190" cy="160" r="100"
                 mask="url(#mask-A-only)"
-                fill="${activeRegions.has('rA') ? `rgba(${colorA},0.55)` : `rgba(${colorA},0.1)`}" 
-                onclick="toggleRegion('rA')"/>
+                fill="${activeRegions.has('rA') ? `rgba(${colorA}, 0.55)` : `rgba(${colorA}, 0.08)`}"
+                onclick="toggleRegion('rA')" />
 
-        <circle id="rB" class="venn-region" cx="310" cy="160" r="100" 
+        <!-- Región Solo B -->
+        <circle id="rB" class="venn-region" cx="310" cy="160" r="100"
                 mask="url(#mask-B-only)"
-                fill="${activeRegions.has('rB') ? `rgba(${colorB},0.55)` : `rgba(${colorB},0.1)`}" 
-                onclick="toggleRegion('rB')"/>
+                fill="${activeRegions.has('rB') ? `rgba(${colorB}, 0.55)` : `rgba(${colorB}, 0.08)`}"
+                onclick="toggleRegion('rB')" />
 
-        <circle id="rAB" class="venn-region" cx="190" cy="160" r="100" 
+        <!-- Intersección A ∩ B -->
+        <circle id="rAB" class="venn-region" cx="190" cy="160" r="100"
                 mask="url(#mask-inter)"
-                fill="${activeRegions.has('rAB') ? `rgba(${colorAB},0.65)` : `rgba(${colorAB},0.15)`}" 
-                onclick="toggleRegion('rAB')"/>
+                fill="${activeRegions.has('rAB') ? `rgba(${colorAB}, 0.70)` : `rgba(${colorAB}, 0.12)`}"
+                onclick="toggleRegion('rAB')" />
 
-        <circle cx="190" cy="160" r="100" fill="none" stroke="rgb(${colorA})" stroke-width="2.5" pointer-events="none"/>
-        <circle cx="310" cy="160" r="100" fill="none" stroke="rgb(${colorB})" stroke-width="2.5" pointer-events="none"/>
+        <!-- Contornos de los círculos -->
+        <circle cx="190" cy="160" r="100" fill="none" stroke="rgb(${colorA})" stroke-width="2.5" pointer-events="none" />
+        <circle cx="310" cy="160" r="100" fill="none" stroke="rgb(${colorB})" stroke-width="2.5" pointer-events="none" />
 
-        <text x="140" y="165" fill="${labelText}" font-size="22" font-weight="bold" pointer-events="none">A</text>
-        <text x="340" y="165" fill="${labelText}" font-size="22" font-weight="bold" pointer-events="none">B</text>
+        <!-- Etiquetas de Conjuntos -->
+        <text x="135" y="165" fill="${labelText}" font-size="22" font-weight="bold" pointer-events="none">A</text>
+        <text x="345" y="165" fill="${labelText}" font-size="22" font-weight="bold" pointer-events="none">B</text>
       `;
     }
 
@@ -358,26 +377,116 @@
       const colorA = isDark ? '88,166,255' : '9,105,218';
       const colorB = isDark ? '57,211,83' : '26,127,55';
       const colorC = isDark ? '188,140,255' : '130,80,223';
+      const colorAB = isDark ? '227,179,65' : '179,134,0';
+      const colorAC = isDark ? '255,123,114' : '207,34,46';
+      const colorBC = isDark ? '56,189,248' : '2,132,199';
+      const colorABC = isDark ? '240,136,62' : '217,119,6';
+      const colorExt = isDark ? '163,113,247' : '130,80,223';
 
       svg.innerHTML = `
-        <rect id="rU" class="venn-region" x="20" y="20" width="460" height="280" rx="10" 
-              fill="${activeRegions.has('rU') ? `rgba(${colorA},0.35)` : uFill}" 
-              stroke="${uStroke}" stroke-width="2" onclick="toggleRegion('rU')"/>
-        <text x="35" y="45" fill="${uText}" font-size="18" font-weight="bold">U</text>
+        <defs>
+          <!-- MÁSCARA EXTERIOR 3 CONJUNTOS (Recorta los 3 círculos) -->
+          <mask id="maskExterior3">
+            <rect x="0" y="0" width="500" height="320" fill="white" />
+            <circle cx="200" cy="135" r="85" fill="black" />
+            <circle cx="300" cy="135" r="85" fill="black" />
+            <circle cx="250" cy="205" r="85" fill="black" />
+          </mask>
+          <mask id="mask-A3-only">
+            <rect x="0" y="0" width="500" height="320" fill="white" />
+            <circle cx="300" cy="135" r="85" fill="black" />
+            <circle cx="250" cy="205" r="85" fill="black" />
+          </mask>
+          <mask id="mask-B3-only">
+            <rect x="0" y="0" width="500" height="320" fill="white" />
+            <circle cx="200" cy="135" r="85" fill="black" />
+            <circle cx="250" cy="205" r="85" fill="black" />
+          </mask>
+          <mask id="mask-C3-only">
+            <rect x="0" y="0" width="500" height="320" fill="white" />
+            <circle cx="200" cy="135" r="85" fill="black" />
+            <circle cx="300" cy="135" r="85" fill="black" />
+          </mask>
+          <mask id="mask-AB3">
+            <circle cx="300" cy="135" r="85" fill="white" />
+            <circle cx="250" cy="205" r="85" fill="black" />
+          </mask>
+          <mask id="mask-AC3">
+            <circle cx="250" cy="205" r="85" fill="white" />
+            <circle cx="300" cy="135" r="85" fill="black" />
+          </mask>
+          <mask id="mask-BC3">
+            <circle cx="250" cy="205" r="85" fill="white" />
+            <circle cx="200" cy="135" r="85" fill="black" />
+          </mask>
+          <mask id="mask-ABC3">
+            <circle cx="300" cy="135" r="85" fill="white" />
+          </mask>
+        </defs>
 
-        <circle id="rA" class="venn-region" cx="200" cy="130" r="85" 
-                fill="${activeRegions.has('rA') || activeRegions.has('rAB') || activeRegions.has('rAC') || activeRegions.has('rABC') ? `rgba(${colorA},0.45)` : `rgba(${colorA},0.08)`}" 
-                stroke="rgb(${colorA})" stroke-width="2" onclick="toggleRegion('rA')"/>
-        <circle id="rB" class="venn-region" cx="300" cy="130" r="85" 
-                fill="${activeRegions.has('rB') || activeRegions.has('rAB') || activeRegions.has('rBC') || activeRegions.has('rABC') ? `rgba(${colorB},0.45)` : `rgba(${colorB},0.08)`}" 
-                stroke="rgb(${colorB})" stroke-width="2" onclick="toggleRegion('rB')"/>
-        <circle id="rC" class="venn-region" cx="250" cy="205" r="85" 
-                fill="${activeRegions.has('rC') || activeRegions.has('rAC') || activeRegions.has('rBC') || activeRegions.has('rABC') ? `rgba(${colorC},0.45)` : `rgba(${colorC},0.08)`}" 
-                stroke="rgb(${colorC})" stroke-width="2" onclick="toggleRegion('rC')"/>
+        <!-- Fondo del Universo -->
+        <rect x="15" y="15" width="470" height="290" rx="12" fill="${uFill}" stroke="${uStroke}" stroke-width="2" />
+        <text x="35" y="45" fill="${uText}" font-size="18" font-weight="bold">𝒰</text>
 
-        <text x="160" y="110" fill="${labelText}" font-size="20" font-weight="bold" pointer-events="none">A</text>
-        <text x="330" y="110" fill="${labelText}" font-size="20" font-weight="bold" pointer-events="none">B</text>
-        <text x="245" y="260" fill="${labelText}" font-size="20" font-weight="bold" pointer-events="none">C</text>
+        <!-- Región Exterior (Complemento de la unión triple) -->
+        <rect class="venn-region" x="15" y="15" width="470" height="290" rx="12"
+              mask="url(#maskExterior3)"
+              fill="${activeRegions.has('rExterior3') ? `rgba(${colorExt}, 0.45)` : 'transparent'}"
+              onclick="toggleRegion('rExterior3')" />
+
+        <!-- Región Solo A -->
+        <circle id="rA" class="venn-region" cx="200" cy="135" r="85"
+                mask="url(#mask-A3-only)"
+                fill="${activeRegions.has('rA') ? `rgba(${colorA}, 0.55)` : `rgba(${colorA}, 0.08)`}"
+                onclick="toggleRegion('rA')" />
+
+        <!-- Región Solo B -->
+        <circle id="rB" class="venn-region" cx="300" cy="135" r="85"
+                mask="url(#mask-B3-only)"
+                fill="${activeRegions.has('rB') ? `rgba(${colorB}, 0.55)` : `rgba(${colorB}, 0.08)`}"
+                onclick="toggleRegion('rB')" />
+
+        <!-- Región Solo C -->
+        <circle id="rC" class="venn-region" cx="250" cy="205" r="85"
+                mask="url(#mask-C3-only)"
+                fill="${activeRegions.has('rC') ? `rgba(${colorC}, 0.55)` : `rgba(${colorC}, 0.08)`}"
+                onclick="toggleRegion('rC')" />
+
+        <!-- Región (A ∩ B) \\ C -->
+        <circle id="rAB" class="venn-region" cx="200" cy="135" r="85"
+                mask="url(#mask-AB3)"
+                fill="${activeRegions.has('rAB') ? `rgba(${colorAB}, 0.65)` : `rgba(${colorAB}, 0.12)`}"
+                onclick="toggleRegion('rAB')" />
+
+        <!-- Región (A ∩ C) \\ B -->
+        <circle id="rAC" class="venn-region" cx="200" cy="135" r="85"
+                mask="url(#mask-AC3)"
+                fill="${activeRegions.has('rAC') ? `rgba(${colorAC}, 0.65)` : `rgba(${colorAC}, 0.12)`}"
+                onclick="toggleRegion('rAC')" />
+
+        <!-- Región (B ∩ C) \\ A -->
+        <circle id="rBC" class="venn-region" cx="300" cy="135" r="85"
+                mask="url(#mask-BC3)"
+                fill="${activeRegions.has('rBC') ? `rgba(${colorBC}, 0.65)` : `rgba(${colorBC}, 0.12)`}"
+                onclick="toggleRegion('rBC')" />
+
+        <!-- Núcleo Central A ∩ B ∩ C -->
+        <g mask="url(#mask-ABC3)">
+          <circle id="rABC" class="venn-region" cx="200" cy="135" r="85"
+                  mask="url(#mask-BC3)"
+                  fill="${activeRegions.has('rABC') ? `rgba(${colorABC}, 0.80)` : `rgba(${colorABC}, 0.15)`}"
+                  onclick="toggleRegion('rABC')" />
+        </g>
+
+        <!-- Contornos de los círculos -->
+        <circle cx="200" cy="135" r="85" fill="none" stroke="rgb(${colorA})" stroke-width="2.5" pointer-events="none" />
+        <circle cx="300" cy="135" r="85" fill="none" stroke="rgb(${colorB})" stroke-width="2.5" pointer-events="none" />
+        <circle cx="250" cy="205" r="85" fill="none" stroke="rgb(${colorC})" stroke-width="2.5" pointer-events="none" />
+
+        <!-- Etiquetas de Conjuntos -->
+        <text x="145" y="115" fill="${labelText}" font-size="20" font-weight="bold" pointer-events="none">A</text>
+        <text x="345" y="115" fill="${labelText}" font-size="20" font-weight="bold" pointer-events="none">B</text>
+        <text x="245" y="275" fill="${labelText}" font-size="20" font-weight="bold" pointer-events="none">C</text>
       `;
     }
 
@@ -392,16 +501,17 @@
     document.getElementById('btn-toggle-sets').onclick = () => {
       mode3Sets = !mode3Sets;
       document.getElementById('btn-toggle-sets').innerText = mode3Sets ? 'Cambiar a 2 Conjuntos (A, B)' : 'Cambiar a 3 Conjuntos (A, B, C)';
-      activeRegions.clear();
-      renderButtons();
-      updateSVG();
+      applyPreset(mode3Sets ? presetOps3[0] : presetOps2[0]);
     };
 
     document.getElementById('btn-reset').onclick = () => {
       activeRegions.clear();
-      document.getElementById('info-title').innerText = 'Selecciona una operación';
-      document.getElementById('info-formula').innerText = '';
-      document.getElementById('info-exp').innerText = 'Haz clic en los botones o en el diagrama para comenzar.';
+      currentOpId = null;
+      document.getElementById('info-title').innerText = 'Regiones Limpias';
+      document.getElementById('info-formula').innerText = '\\emptyset';
+      document.getElementById('info-exp').innerText = 'Haz clic en los botones o en el diagrama para seleccionar regiones.';
+      renderButtons();
+      renderMathInElement(document.getElementById('info-formula'));
       updateSVG();
     };
 

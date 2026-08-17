@@ -16,9 +16,10 @@ Desarrollado bajo el motor **iCartesiLibri** de la **Red Educativa Digital Desca
 - 📖 **Estructura Paginada eBook:** Maquetación HTML5 responsiva tipo libro con tabla de contenidos dinámica, temas claro/oscuro y numeración automática.
 - 📐 **Renderizado Matemático KaTeX:** Expresiones LaTeX en línea \(\( ... \)\) y en bloque \(\$\$ ... \$\$\) ultrarrápidas y accesibles.
 - 🧪 **Escenas e Interactivos HTML5 (Evolución de Applets Java):**
-  - **Simulador SVG de Diagramas de Venn (`interactivos/simulador_venn.html`):** Sombras e intersecciones interactivas para 2 y 3 conjuntos (\(A, B, C\)) con selección de región manual.
+  - **Simulador de Demostraciones Paso a Paso (`interactivos/simulador_demostraciones.html`):** Visualizador formal de deducción matemática con 12 teoremas, justificaciones axiomáticas, reproducción automática (Auto/Pausa) y notación KaTeX.
+  - **Simulador SVG de Diagramas de Venn (`interactivos/simulador_venn.html`):** Motor avanzado de 19 operaciones para 2 y 3 conjuntos (\(A, B, C\)) con máscaras booleanas exactas (`#maskExterior2`, `#maskExterior3`) y exploración manual atómica.
   - **Evaluador de Tablas de Verdad (`interactivos/tablas_verdad.html`):** Construcción interactiva celda a celda con detección automática de Tautologías y Contradicciones.
-  - **Evaluador Autocorregible DescartesJS (`interactivos/evaluador_descartes.html`):** Examen interactivo con reactivos CENEVAL/TNM, aleatorización y solución detallada.
+  - **Evaluador Autocorregible DescartesJS (`interactivos/evaluador_descartes.html`):** Banco ampliado de 24 reactivos clasificados en 4 módulos curriculares, con retroalimentación paso a paso.
   - **GeoGebra Web API (`interactivos/geogebra_logica.html`):** Applet dinámico de geometría de conjuntos y circuitos lógicos.
 - ♿ **Accesibilidad Tipográfica:** Controles integrados de escalado dinámico de fuente (7 niveles, desde `0.85x` hasta `2.00x`).
 - 📶 **100% Offline & Multiplataforma:** No requiere plugins de Java ni conexión activa a internet tras abrir la página.
@@ -39,9 +40,10 @@ Desarrollado bajo el motor **iCartesiLibri** de la **Red Educativa Digital Desca
 │   │   └── contrib/auto-render.min.js
 │   └── fonts.css
 ├── interactivos/                    # Escenas HTML5 e Interactivos Incrustados
-│   ├── simulador_venn.html          # Simulador SVG de Diagramas de Venn
+│   ├── simulador_demostraciones.html# Simulador de Demostraciones Paso a Paso
+│   ├── simulador_venn.html          # Simulador SVG de Diagramas de Venn (19 operaciones)
 │   ├── tablas_verdad.html           # Evaluador de Tablas de Verdad
-│   ├── evaluador_descartes.html     # Quiz Autocorregible DescartesJS
+│   ├── evaluador_descartes.html     # Quiz Autocorregible DescartesJS (24 reactivos)
 │   └── geogebra_logica.html         # Applet GeoGebra HTML5
 └── images/                          # Logotipos e imágenes vectoriales
 ```

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Evaluador Interactivo DescartesJS — Banco CENEVAL/TNM</title>
+  <title>Evaluador Autocorregible DescartesJS — Lógica y Conjuntos</title>
 
   <!-- KaTeX -->
   <link rel="stylesheet" href="../extra/katex/katex.min.css">
@@ -65,26 +65,55 @@
       color: var(--accent-blue);
       margin-top: 0;
       margin-bottom: 4px;
-      font-size: 1.1rem;
+      font-size: 0.92rem;
       text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     .container {
       width: 100%;
-      max-width: 740px;
+      max-width: 760px;
       display: flex;
       flex-direction: column;
       gap: 8px;
+    }
+
+    .filter-bar {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-filter {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-color);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-filter.active {
+      background: var(--accent-blue);
+      color: #ffffff;
+      border-color: var(--accent-blue);
     }
 
     .card {
       background: var(--card-bg);
       border: 1px solid var(--border-color);
-      border-radius: 6px;
-      padding: 10px 14px;
+      border-radius: 8px;
+      padding: 12px 16px;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 10px;
     }
 
     .question-header {
@@ -94,30 +123,31 @@
       font-size: 0.82rem;
       color: var(--text-color);
       border-bottom: 1px solid var(--border-color);
-      padding-bottom: 4px;
+      padding-bottom: 6px;
     }
 
     .question-text {
       font-size: 0.95rem;
+      font-weight: 600;
       color: var(--text-bright);
-      line-height: 1.4;
+      line-height: 1.45;
     }
 
     .options-grid {
-      display: flex;
-      flex-direction: column;
+      display: grid;
+      grid-template-columns: 1fr;
       gap: 6px;
     }
 
     .opt-btn {
       background: var(--btn-bg);
-      color: var(--text-color);
       border: 1px solid var(--border-color);
-      border-radius: 5px;
-      padding: 8px 10px;
-      font-size: 0.85rem;
-      text-align: left;
+      border-radius: 6px;
+      padding: 8px 12px;
+      color: var(--text-color);
+      font-size: 0.88rem;
       cursor: pointer;
+      text-align: left;
       transition: all 0.2s ease;
       display: flex;
       align-items: center;
@@ -130,13 +160,14 @@
     }
 
     .opt-btn.correct {
-      background: rgba(57, 211, 83, 0.2) !important;
+      background: rgba(26, 127, 55, 0.15) !important;
       border-color: var(--accent-green) !important;
       color: var(--accent-green) !important;
+      font-weight: bold;
     }
 
     .opt-btn.incorrect {
-      background: rgba(248, 81, 73, 0.2) !important;
+      background: rgba(207, 34, 46, 0.15) !important;
       border-color: var(--accent-red) !important;
       color: var(--accent-red) !important;
     }
@@ -144,10 +175,10 @@
     .explanation-box {
       background: var(--info-bg);
       border-left: 4px solid var(--accent-purple);
-      border-radius: 0 4px 4px 0;
-      padding: 8px 10px;
-      font-size: 0.85rem;
-      line-height: 1.3;
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-size: 0.82rem;
+      line-height: 1.35;
       display: none;
       border: 1px solid var(--border-color);
       border-left-width: 4px;
@@ -163,8 +194,8 @@
       background: var(--accent-blue);
       color: #ffffff;
       border: none;
-      border-radius: 4px;
-      padding: 6px 12px;
+      border-radius: 6px;
+      padding: 6px 14px;
       font-weight: bold;
       font-size: 0.85rem;
       cursor: pointer;
@@ -185,9 +216,11 @@
   <div class="container">
     <h2>📝 Evaluador Autocorregible DescartesJS</h2>
 
+    <div class="filter-bar" id="filter-container"></div>
+
     <div class="card" id="quiz-card">
       <div class="question-header">
-        <span id="module-tag">Módulo 1 — Lógica Proposicional</span>
+        <span id="module-tag" style="font-weight: bold; color: var(--accent-blue);">Módulo 1 — Lógica Proposicional</span>
         <span class="score-badge" id="score-tag">Puntaje: 0 / 0</span>
       </div>
 
@@ -196,12 +229,12 @@
       <div class="options-grid" id="options-container"></div>
 
       <div class="explanation-box" id="exp-box">
-        <div style="font-weight:bold; color:var(--accent-purple); margin-bottom:2px; font-size:0.85rem;">Explicación Paso a Paso:</div>
+        <div style="font-weight:bold; color:var(--accent-purple); margin-bottom:2px; font-size:0.85rem;">Explicación y Justificación Lógica:</div>
         <div id="exp-text"></div>
       </div>
 
       <div class="controls">
-        <div id="q-progress" style="font-size:0.8rem; color:var(--text-color);">Pregunta 1 de 5</div>
+        <div id="q-progress" style="font-size:0.8rem; color:var(--text-color);">Pregunta 1 de 24</div>
         <button class="btn-nav" id="btn-next" onclick="nextQuestion()" style="display:none;">Siguiente Reactivo →</button>
       </div>
     </div>
@@ -221,7 +254,9 @@
       }
     } catch(e) {}
 
-    const sampleQuestions = [
+    // ── BANCO EXTENDIDO DE 24 PREGUNTAS (6 POR MÓDULO) ───────────────────
+    const ALL_QUESTIONS = [
+      // MÓDULO 1: LÓGICA PROPOSICIONAL Y TABLAS DE VERDAD
       {
         modulo: "Lógica Proposicional",
         pregunta: "¿Cuál es el valor de verdad del condicional \\(p \\to q\\) cuando el antecedente \\(p\\) es VERDADERO y el consecuente \\(q\\) es FALSO?",
@@ -232,35 +267,221 @@
           "Tautológico"
         ],
         correcta: 1,
-        explicacion: "Un condicional \\(p \\to q\\) es FALSO en un único caso: cuando la premisa \\(p\\) es Verdadera y la conclusión \\(q\\) es Falsa."
+        explicacion: "Un condicional \\(p \\to q\\) es FALSO en un único caso: cuando la premisa \\(p\\) es Verdadera y la conclusión \\(q\\) es Falsa. En cualquier otro caso es Verdadero."
       },
       {
-        modulo: "Teoría de Conjuntos",
-        pregunta: "Si el conjunto \\(A = \\{1, 2, 3\\}\\), ¿cuál es el cardinal del conjunto potencia \\(|\\mathcal{P}(A)|\\)?",
+        modulo: "Lógica Proposicional",
+        pregunta: "Una proposición molecular cuya tabla de verdad resulta ser VERDADERA en todas y cada una de sus filas se clasifica formalmente como:",
         opciones: [
-          "\\(3\\)",
-          "\\(6\\)",
-          "\\(8\\)",
-          "\\(9\\)"
+          "Contingencia",
+          "Contradicción",
+          "Tautología",
+          "Falacia formal"
         ],
         correcta: 2,
-        explicacion: "El cardinal del conjunto potencia de cualquier conjunto finito con \\(n\\) elementos está dado por \\(|\\mathcal{P}(A)| = 2^n\\). Para \\(n=3\\), \\(2^3 = 8\\)."
+        explicacion: "Por definición de la semántica proposicional, una fórmula que es siempre verdadera bajo cualquier asignación de verdad de sus variables atómicas es una Tautología (ejemplo: \\(p \\lor \\neg p\\))."
+      },
+      {
+        modulo: "Lógica Proposicional",
+        pregunta: "¿Cuál de las siguientes expresiones es lógicamente equivalente a la negación de la conjunción \\(\\neg(p \\land q)\\)?",
+        opciones: [
+          "\\(\\neg p \\land \\neg q\\)",
+          "\\(\\neg p \\lor \\neg q\\)",
+          "\\(p \\lor q\\)",
+          "\\(p \\to \\neg q\\)"
+        ],
+        correcta: 1,
+        explicacion: "Por la 1ª Ley de De Morgan para la lógica proposicional, la negación de una conjunción equivale a la disyunción de las negaciones: \\(\\neg(p \\land q) \\equiv \\neg p \\lor \\neg q\\)."
+      },
+      {
+        modulo: "Lógica Proposicional",
+        pregunta: "El condicional \\(p \\to q\\) es lógicamente equivalente a su forma disyuntiva:",
+        opciones: [
+          "\\(\\neg p \\lor q\\)",
+          "\\(p \\land \\neg q\\)",
+          "\\(\\neg p \\land q\\)",
+          "\\(q \\to p\\)"
+        ],
+        correcta: 0,
+        explicacion: "Por definición del condicional material en lógica clásica, \\(p \\to q \\equiv \\neg p \\lor q\\). Ambas expresiones comparten exactamente la misma columna en su tabla de verdad."
+      },
+      {
+        modulo: "Lógica Proposicional",
+        pregunta: "Para una tabla de verdad con 4 variables proposicionales independientes (\\(p, q, r, s\\)), ¿cuántas filas de combinaciones de verdad se deben generar?",
+        opciones: [
+          "\\(8\\)",
+          "\\(12\\)",
+          "\\(16\\)",
+          "\\(24\\)"
+        ],
+        correcta: 2,
+        explicacion: "El número de asignaciones de verdad para \\(n\\) variables binarias independientes es \\(2^n\\). Para \\(n=4\\), \\(2^4 = 16\\) filas."
+      },
+      {
+        modulo: "Lógica Proposicional",
+        pregunta: "¿Cuál es la proposición recíproca (conversa) de la implicación \\(p \\to q\\)?",
+        opciones: [
+          "\\(\\neg p \\to \\neg q\\)",
+          "\\(q \\to p\\)",
+          "\\(\\neg q \\to \\neg p\\)",
+          "\\(\\neg(p \\to q)\\)"
+        ],
+        correcta: 1,
+        explicacion: "Dada la implicación directa \\(p \\to q\\), su recíproca es \\(q \\to p\\), su inversa es \\(\\neg p \\to \\neg q\\), y su contrapositiva es \\(\\neg q \\to \\neg p\\)."
+      },
+
+      // MÓDULO 2: CUANTIFICADORES Y MÉTODOS DE INFERENCIA
+      {
+        modulo: "Cuantificadores e Inferencia",
+        pregunta: "¿Cuál es la negación lógica formal de la proposición cuantificada universalmente \\((\\forall x \\in A) p(x)\\)?",
+        opciones: [
+          "\\((\\forall x \\in A) \\neg p(x)\\)",
+          "\\((\\exists x \\in A) \\neg p(x)\\)",
+          "\\((\\exists x \\notin A) p(x)\\)",
+          "\\(\\neg(\\exists x \\in A) p(x)\\)"
+        ],
+        correcta: 1,
+        explicacion: "Para negar que 'todos los elementos cumplen \\(p\\)', basta con asegurar que 'existe al menos un elemento que NO cumple \\(p\\)': \\(\\neg(\\forall x \\in A) p(x) \\equiv (\\exists x \\in A) \\neg p(x)\\)."
+      },
+      {
+        modulo: "Cuantificadores e Inferencia",
+        pregunta: "La regla de inferencia 'Modus Ponendo Ponens' (m.p.p.) establece que a partir de las premisas \\(p \\to q\\) y \\(p\\), se concluye válidamente:",
+        opciones: [
+          "\\(\\neg p\\)",
+          "\\(q\\)",
+          "\\(\\neg q\\)",
+          "\\(p \\land q\\)"
+        ],
+        correcta: 1,
+        explicacion: "El Modus Ponens afirma el antecedente para deducir el consecuente: de \\(p \\to q\\) y \\(p\\), se obtiene legítimamente \\(q\\)."
+      },
+      {
+        modulo: "Cuantificadores e Inferencia",
+        pregunta: "La regla de inferencia 'Modus Tollendo Tollens' (m.t.t.) establece que de \\(p \\to q\\) y \\(\\neg q\\), se concluye:",
+        opciones: [
+          "\\(p\\)",
+          "\\(\\neg p\\)",
+          "\\(q\\)",
+          "\\(\\neg(p \\land q)\\)"
+        ],
+        correcta: 1,
+        explicacion: "El Modus Tollens niega el consecuente para negar el antecedente: de \\(p \\to q\\) y \\(\\neg q\\), se deriva \\(\\neg p\\)."
+      },
+      {
+        modulo: "Cuantificadores e Inferencia",
+        pregunta: "¿Qué significa el cuantificador de existencia única \\((\\exists! x \\in A) p(x)\\)?",
+        opciones: [
+          "Que no existe ningún elemento que cumpla \\(p(x)\\).",
+          "Que al menos dos elementos cumplen \\(p(x)\\).",
+          "Que existe exactamente un único elemento en \\(A\\) que cumple \\(p(x)\\).",
+          "Que todos los elementos de \\(A\\) cumplen \\(p(x)\\)."
+        ],
+        correcta: 2,
+        explicacion: "El cuantificador \\(\\exists!\\) representa unicidad: garantiza la existencia de un testigo y la imposibilidad de que haya dos o más elementos distintos que satisfagan la propiedad."
+      },
+      {
+        modulo: "Cuantificadores e Inferencia",
+        pregunta: "La regla 'Modus Tollendo Ponens' (m.t.p.) establece que a partir de \\(p \\lor q\\) y \\(\\neg p\\), se concluye:",
+        opciones: [
+          "\\(q\\)",
+          "\\(\\neg q\\)",
+          "\\(p\\)",
+          "\\(p \\to q\\)"
+        ],
+        correcta: 0,
+        explicacion: "El silogismo disyuntivo (m.t.p.) niega una de las alternativas de una disyunción para afirmar necesariamente la otra: de \\(p \\lor q\\) y \\(\\neg p\\), se concluye \\(q\\)."
+      },
+      {
+        modulo: "Cuantificadores e Inferencia",
+        pregunta: "¿Cuál es el valor de verdad de \\((\\forall x \\in \\mathbb{R})(x^2 \\ge 0)\\)?",
+        opciones: [
+          "Verdadero",
+          "Falso, porque \\(0^2 = 0\\)",
+          "Falso para números negativos",
+          "Indeterminado"
+        ],
+        correcta: 0,
+        explicacion: "En el cuerpo ordenado de los números reales \\(\\mathbb{R}\\), el cuadrado de cualquier número real es mayor o igual a cero (no negativo), por lo que la afirmación universal es estrictamente Verdadera."
+      },
+
+      // MÓDULO 3: TEORÍA DE CONJUNTOS Y ÁLGEBRA BOOLEANA
+      {
+        modulo: "Teoría de Conjuntos",
+        pregunta: "Si el conjunto \\(A = \\{1, 2, 3, 4\\}\\), ¿cuál es el cardinal del conjunto potencia \\(|\\mathcal{P}(A)|\\)?",
+        opciones: [
+          "\\(8\\)",
+          "\\(12\\)",
+          "\\(16\\)",
+          "\\(24\\)"
+        ],
+        correcta: 2,
+        explicacion: "El cardinal del conjunto de partes (conjunto potencia) de un conjunto con \\(n\\) elementos es \\(2^n\\). Para \\(n=4\\), \\(2^4 = 16\\) subconjuntos."
       },
       {
         modulo: "Teoría de Conjuntos",
-        pregunta: "Según la 1ª Ley de De Morgan para teoría de conjuntos, ¿a qué es equivalente el complemento de la unión \\((A \\cup B)'\\)?",
+        pregunta: "La diferencia simétrica entre dos conjuntos \\(A \\Delta B\\) se define formalmente como:",
         opciones: [
-          "\\(A' \\cup B'\\)",
-          "\\(A' \\cap B'\\)",
-          "\\(A \\setminus B\\)",
-          "\\((A \\cap B)'\\)"
+          "\\((A \\setminus B) \\cap (B \\setminus A)\\)",
+          "\\((A \\setminus B) \\cup (B \\setminus A) = (A \\cup B) \\setminus (A \\cap B)\\)",
+          "\\(A \\cap B^c\\)",
+          "\\(A^c \\cup B^c\\)"
         ],
         correcta: 1,
-        explicacion: "La 1ª Ley de De Morgan establece que \\((A \\cup B)' = A' \\cap B'\\). El complemento invierte la unión en intersección."
+        explicacion: "La diferencia simétrica reúne los elementos que pertenecen a \\(A\\) o a \\(B\\) pero que NO están en la intersección simultánea de ambos."
       },
       {
-        modulo: "Métodos de Demostración",
-        pregunta: "En una demostración por contraposición de \\(P \\Rightarrow Q\\), ¿cuál es la proposición lógicamente equivalente que se demuestra?",
+        modulo: "Teoría de Conjuntos",
+        pregunta: "Según la 1ª Ley de De Morgan para teoría de conjuntos, ¿a qué es equivalente el complemento de la unión \\((A \\cup B)^c\\)?",
+        opciones: [
+          "\\(A^c \\cup B^c\\)",
+          "\\(A^c \\cap B^c\\)",
+          "\\(A \\setminus B\\)",
+          "\\((A \\cap B)^c\\)"
+        ],
+        correcta: 1,
+        explicacion: "La 1ª Ley de De Morgan establece que \\((A \\cup B)^c = A^c \\cap B^c\\). El complemento exterior transforma la unión en intersección de complementos."
+      },
+      {
+        modulo: "Teoría de Conjuntos",
+        pregunta: "Si \\(A \\subseteq B\\), ¿cuál de las siguientes igualdades conjuntistas es SIEMPRE verdadera?",
+        opciones: [
+          "\\(A \\cup B = A\\)",
+          "\\(A \\cap B = A\\)",
+          "\\(A \\setminus B = B\\)",
+          "\\(B \\subseteq A\\)"
+        ],
+        correcta: 1,
+        explicacion: "Si todos los elementos de \\(A\\) están contenidos en \\(B\\), entonces la intersección \\(A \\cap B\\) es idéntica a \\(A\\), y la unión \\(A \\cup B\\) es idéntica a \\(B\\)."
+      },
+      {
+        modulo: "Teoría de Conjuntos",
+        pregunta: "Para tres conjuntos cualesquiera \\(A, B, C\\), la ley distributiva de la intersección respecto a la unión establece:",
+        opciones: [
+          "\\(A \\cap (B \\cup C) = (A \\cap B) \\cup (A \\cap C)\\)",
+          "\\(A \\cup (B \\cap C) = (A \\cup B) \\cap C\\)",
+          "\\(A \\cap (B \\cup C) = (A \\cup B) \\cap (A \\cup C)\\)",
+          "\\(A \\setminus (B \\cap C) = (A \\setminus B) \\cap C\\)"
+        ],
+        correcta: 0,
+        explicacion: "La intersección se distribuye sobre la unión de la misma forma que la multiplicación sobre la suma: \\(A \\cap (B \\cup C) = (A \\cap B) \\cup (A \\cap C)\\)."
+      },
+      {
+        modulo: "Teoría de Conjuntos",
+        pregunta: "El conjunto vacío \\(\\emptyset\\) satisface que para cualquier conjunto \\(A\\):",
+        opciones: [
+          "\\(\\emptyset \\in A\\) siempre",
+          "\\(\\emptyset \\subseteq A\\) siempre",
+          "\\(\\emptyset \\cup A = \\emptyset\\)",
+          "\\(|\\emptyset| = 1\\)"
+        ],
+        correcta: 1,
+        explicacion: "Por vacuidad lógica, \\(\\emptyset\\) es subconjunto de todo conjunto \\(A\\) (pues la condición 'todo elemento de \\(\\emptyset\\) está en \\(A\\)' es una verdad vacua)."
+      },
+
+      // MÓDULO 4: MÉTODOS DE DEMOSTRACIÓN E INDUCCIÓN
+      {
+        modulo: "Demostraciones e Inducción",
+        pregunta: "En una demostración por contraposición de \\(P \\Rightarrow Q\\), ¿cuál es la proposición equivalente que se debe demostrar?",
         opciones: [
           "\\(Q \\Rightarrow P\\)",
           "\\(\\neg P \\Rightarrow \\neg Q\\)",
@@ -268,34 +489,108 @@
           "\\(P \\land \\neg Q\\)"
         ],
         correcta: 2,
-        explicacion: "La contrapositiva de una implicación \\(P \\Rightarrow Q\\) es \\(\\neg Q \\Rightarrow \\neg P\\). Ambas proposiciones poseen exactamente la misma tabla de verdad."
+        explicacion: "La contrapositiva de una implicación \\(P \\Rightarrow Q\\) es \\(\\neg Q \\Rightarrow \\neg P\\). Ambas tienen idéntica tabla de verdad y son lógicamente indistinguibles."
       },
       {
-        modulo: "Métodos de Demostración",
-        pregunta: "¿Cuáles son los dos pasos fundamentales de una prueba por Inducción Matemática para una propiedad \\(P(n)\\)?",
+        modulo: "Demostraciones e Inducción",
+        pregunta: "En una demostración por reducción al absurdo (contradicción) para probar una tesis \\(T\\), se asume inicialmente:",
+        opciones: [
+          "Que \\(T\\) es verdadera.",
+          "Que \\(\\neg T\\) es verdadera (negar la tesis) y se deduce una contradicción lógica.",
+          "Que las premisas son falsas.",
+          "Un contraejemplo numérico."
+        ],
+        correcta: 1,
+        explicacion: "La prueba por reducción al absurdo asume la falsedad de la tesis (\\(\\neg T\\)) junto con los axiomas/hipótesis, demostrando que esto conduce inevitablemente a una contradicción \\(\\bot\\) (ejemplo \\(p \\land \\neg p\\))."
+      },
+      {
+        modulo: "Demostraciones e Inducción",
+        pregunta: "¿Cuáles son los dos pasos obligatorios en una prueba por Inducción Matemática sobre \\(\\mathbb{N}\\)?",
         opciones: [
           "Paso Base \\(P(1)\\) y Paso Inductivo \\(P(k) \\Rightarrow P(k+1)\\)",
-          "Demostración directa y contraejemplo",
-          "Suposición de contradicción y reducción al absurdo",
-          "Paso Base \\(P(0)\\) y Paso de Clausura \\(P(n) = 0\\)"
+          "Paso Directo y Contrapositivo",
+          "Evaluación de 10 casos y extrapolación",
+          "Paso Base \\(P(0)\\) y Paso Infinito"
         ],
         correcta: 0,
-        explicacion: "La Inducción Matemática exige comprobar el caso base (usualmente \\(n=1\\)) y demostrar que la hipótesis inductiva \\(P(k)\\) implica la validez para \\(P(k+1)\\)."
+        explicacion: "La Inducción Matemática exige: (1) Demostrar el Paso Base \\(P(1)\\), y (2) Demostrar el Paso Inductivo, mostrando que bajo la hipótesis de que \\(P(k)\\) es cierta, se deduce necesariamente \\(P(k+1)\\)."
+      },
+      {
+        modulo: "Demostraciones e Inducción",
+        pregunta: "¿Cuál es el valor de la suma de los primeros \\(n\\) números enteros positivos \\(\\sum_{i=1}^n i = 1 + 2 + \\dots + n\\)?",
+        opciones: [
+          "\\(n^2\\)",
+          "\\(\\frac{n(n+1)}{2}\\)",
+          "\\(\\frac{n(n-1)}{2}\\)",
+          "\\(2^n - 1\\)"
+        ],
+        correcta: 1,
+        explicacion: "Por la fórmula demostrada por Gauss e inducción matemática: \\(\\sum_{i=1}^n i = \\frac{n(n+1)}{2}\\)."
+      },
+      {
+        modulo: "Demostraciones e Inducción",
+        pregunta: "Para refutar una proposición universal \\((\\forall x \\in A) p(x)\\), ¿qué es estrictamente suficiente presentar?",
+        opciones: [
+          "Una demostración por contradicción formal.",
+          "Un único contraejemplo \\(x_0 \\in A\\) tal que \\(p(x_0)\\) sea falsa.",
+          "La tabla de verdad completa del predicado.",
+          "La demostración del recíproco."
+        ],
+        correcta: 1,
+        explicacion: "Un cuantificador universal afirma que la propiedad se cumple para todos y cada uno de los elementos. Por tanto, exhibir un único contraejemplo es suficiente y necesario para refutarlo."
+      },
+      {
+        modulo: "Demostraciones e Inducción",
+        pregunta: "¿Por qué el Teorema Fundamental de la Aritmética permite demostrar por contradicción que \\(\\sqrt{2}\\) es irracional?",
+        opciones: [
+          "Porque el conteo de factores primos 2 en \\(a^2 = 2b^2\\) produce una cantidad par en la izquierda e impar en la derecha (paridad contradictoria).",
+          "Porque 2 es un número negativo.",
+          "Porque la raíz cuadrada no existe para números pares.",
+          "Porque todo número entero es primo."
+        ],
+        correcta: 0,
+        explicacion: "En la factorización única en primos, \\(a^2\\) tiene un número par de factores 2, mientras que \\(2b^2\\) tiene un número impar de factores 2, haciendo imposible la igualdad en los enteros."
       }
     ];
 
+    let currentModulo = "Todos";
+    let activeQuestions = [...ALL_QUESTIONS];
     let currentQ = 0;
     let score = 0;
     let answered = false;
 
+    const modules = ["Todos", "Lógica Proposicional", "Cuantificadores e Inferencia", "Teoría de Conjuntos", "Demostraciones e Inducción"];
+
+    function renderFilters() {
+      const fCont = document.getElementById('filter-container');
+      fCont.innerHTML = '';
+      modules.forEach(m => {
+        const btn = document.createElement('button');
+        btn.className = `btn-filter ${currentModulo === m ? 'active' : ''}`;
+        btn.innerText = m === "Todos" ? "🌐 Todos (24 Reactivos)" : m;
+        btn.onclick = () => {
+          currentModulo = m;
+          activeQuestions = (m === "Todos")
+            ? [...ALL_QUESTIONS].sort(() => 0.5 - Math.random())
+            : ALL_QUESTIONS.filter(q => q.modulo === m);
+          currentQ = 0;
+          score = 0;
+          renderFilters();
+          renderQuestion();
+        };
+        fCont.appendChild(btn);
+      });
+    }
+
     function renderQuestion() {
-      const q = sampleQuestions[currentQ];
+      if (activeQuestions.length === 0) return;
+      const q = activeQuestions[currentQ];
       answered = false;
 
       document.getElementById('module-tag').innerText = `Módulo: ${q.modulo}`;
-      document.getElementById('score-tag').innerText = `Puntaje: ${score} / ${sampleQuestions.length}`;
+      document.getElementById('score-tag').innerText = `Puntaje: ${score} / ${activeQuestions.length}`;
       document.getElementById('q-text').innerHTML = q.pregunta;
-      document.getElementById('q-progress').innerText = `Pregunta ${currentQ + 1} de ${sampleQuestions.length}`;
+      document.getElementById('q-progress').innerText = `Pregunta ${currentQ + 1} de ${activeQuestions.length}`;
       document.getElementById('btn-next').style.display = 'none';
       document.getElementById('exp-box').style.display = 'none';
 
@@ -317,7 +612,7 @@
       if (answered) return;
       answered = true;
 
-      const q = sampleQuestions[currentQ];
+      const q = activeQuestions[currentQ];
       const buttons = document.querySelectorAll('.opt-btn');
 
       if (idx === q.correcta) {
@@ -328,7 +623,7 @@
         buttons[q.correcta].classList.add('correct');
       }
 
-      document.getElementById('score-tag').innerText = `Puntaje: ${score} / ${sampleQuestions.length}`;
+      document.getElementById('score-tag').innerText = `Puntaje: ${score} / ${activeQuestions.length}`;
       document.getElementById('exp-text').innerHTML = q.explicacion;
       document.getElementById('exp-box').style.display = 'block';
       document.getElementById('btn-next').style.display = 'block';
@@ -337,7 +632,7 @@
     }
 
     function nextQuestion() {
-      if (currentQ < sampleQuestions.length - 1) {
+      if (currentQ < activeQuestions.length - 1) {
         currentQ++;
         renderQuestion();
       } else {
@@ -347,16 +642,24 @@
 
     function showFinalResults() {
       const card = document.getElementById('quiz-card');
-      const pct = Math.round((score / sampleQuestions.length) * 100);
+      const pct = Math.round((score / activeQuestions.length) * 100);
       card.innerHTML = `
-        <div style="text-align:center; padding: 15px;">
-          <h3 style="color:var(--accent-green); font-size:1.3rem; margin-bottom:6px;">¡Evaluación Completada! 🎉</h3>
-          <p style="font-size:1rem; color:var(--text-bright);">Tu puntaje final es: <strong>${score} de ${sampleQuestions.length}</strong> (${pct}%)</p>
-          <button class="btn-nav" style="margin-top:10px;" onclick="location.reload()">Reintentar Evaluación</button>
+        <div style="text-align:center; padding: 20px 15px;">
+          <div style="font-size: 2.2rem; margin-bottom: 8px;">🎉</div>
+          <h3 style="color:var(--accent-green); font-size:1.3rem; margin: 0 0 6px;">¡Evaluación Formativa Concluida!</h3>
+          <p style="font-size:1rem; color:var(--text-bright); margin: 6px 0 14px;">
+            Tu calificación final es: <strong>${score} de ${activeQuestions.length} aciertos</strong> (${pct}%)
+          </p>
+          <div style="font-size:0.85rem; color:var(--text-color); margin-bottom: 16px;">
+            ${pct >= 80 ? "🏆 ¡Excelente dominio conceptual de Lógica y Conjuntos!" : pct >= 60 ? "👍 Buen avance. Te recomendamos repasar los temas con errores." : "⚠️ Se recomienda repasar las demostraciones formales y tablas de verdad."}
+          </div>
+          <button class="btn-nav" onclick="location.reload()">↺ Reiniciar Evaluación</button>
         </div>
       `;
     }
 
+    // Inicialización
+    renderFilters();
     renderQuestion();
   </script>
 </body>

@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulador de Demostraciones Matemáticas — Red Descartes / UAN</title>
+  
+  <!-- KaTeX -->
+  <link rel="stylesheet" href="../extra/katex/katex.min.css">
+  <script src="../extra/katex/katex.min.js"></script>
+  <script src="../extra/katex/contrib/auto-render.min.js"></script>
+
+  <style>
+    :root {
+      /* MODO CLARO (Default) */
+      --bg-color: #ffffff;
+      --card-bg: #f6f8fa;
+      --card-highlight: #f0f7ff;
+      --border-color: #d0d7de;
+      --accent-color: #0969da;
+      --accent-green: #1a7f37;
+      --accent-purple: #8250df;
+      --accent-orange: #cf222e;
+      --text-color: #24292f;
+      --text-bright: #0f172a;
+      --text-muted: #57606a;
+      --btn-bg: #f3f4f6;
+      --btn-hover: #e5e7eb;
+    }
+
+    :root[data-theme="dark"] {
+      /* MODO OSCURO */
+      --bg-color: #0d1117;
+      --card-bg: #161b22;
+      --card-highlight: rgba(88, 166, 255, 0.12);
+      --border-color: #30363d;
+      --accent-color: #58a6ff;
+      --accent-green: #39d353;
+      --accent-purple: #bc8cff;
+      --accent-orange: #f0883e;
+      --text-color: #c9d1d9;
+      --text-bright: #ffffff;
+      --text-muted: #8b949e;
+      --btn-bg: #21262d;
+      --btn-hover: #30363d;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      margin: 0;
+      padding: 8px 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-sizing: border-box;
+      overflow-x: hidden;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    h2 {
+      color: var(--accent-color);
+      margin-top: 0;
+      margin-bottom: 4px;
+      font-size: 0.88rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      text-align: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 780px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .panel {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 8px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .cats-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: center;
+    }
+
+    .btn-cat {
+      background: var(--btn-bg);
+      color: var(--text-color);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-cat:hover {
+      border-color: var(--accent-color);
+      color: var(--text-bright);
+    }
+
+    .btn-cat.active {
+      background: var(--accent-color);
+      color: #ffffff;
+      border-color: var(--accent-color);
+    }
+
+    .dems-list {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .btn-dem {
+      background: var(--btn-bg);
+      color: var(--text-color);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-size: 0.80rem;
+      font-weight: 600;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-dem:hover {
+      border-color: var(--accent-green);
+      color: var(--text-bright);
+    }
+
+    .btn-dem.active {
+      border: 2px solid var(--accent-green);
+      background: rgba(26, 127, 55, 0.15);
+      color: var(--accent-green);
+      font-weight: bold;
+    }
+
+    .theorem-header {
+      background: var(--card-highlight);
+      border: 1px solid var(--accent-color);
+      border-left: 4px solid var(--accent-color);
+      border-radius: 8px;
+      padding: 10px 14px;
+    }
+
+    .grid-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    @media (max-width: 650px) {
+      .grid-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .steps-container {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 10px;
+      max-height: 280px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .step-item {
+      padding: 8px 10px;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      font-size: 0.82rem;
+      line-height: 1.35;
+      transition: all 0.25s ease;
+    }
+
+    .step-item.active {
+      background: var(--card-highlight);
+      border-color: var(--accent-color);
+      font-weight: 600;
+    }
+
+    .step-item.passed {
+      background: rgba(26, 127, 55, 0.08);
+      border-color: rgba(26, 127, 55, 0.25);
+    }
+
+    .step-item.future {
+      opacity: 0.45;
+    }
+
+    .step-badge {
+      font-size: 0.72rem;
+      font-weight: bold;
+      color: var(--accent-purple);
+      margin-bottom: 2px;
+    }
+
+    .focus-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .focus-box {
+      background: var(--card-highlight);
+      border-left: 3px solid var(--accent-color);
+      border-radius: 6px;
+      padding: 10px 12px;
+      min-height: 100px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 5px;
+      background: var(--border-color);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--accent-color);
+      transition: width 0.35s ease;
+    }
+
+    .nav-controls {
+      display: flex;
+      gap: 6px;
+    }
+
+    .btn-nav {
+      flex: 1;
+      padding: 8px 6px;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+      background: var(--btn-bg);
+      color: var(--text-color);
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s ease;
+    }
+
+    .btn-nav:hover:not(:disabled) {
+      background: var(--btn-hover);
+      color: var(--text-bright);
+    }
+
+    .btn-nav:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .btn-play {
+      background: var(--accent-color);
+      color: #ffffff;
+      border: none;
+    }
+
+    .btn-play:hover {
+      filter: brightness(1.1);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>🧮 Simulador de Demostraciones Matemáticas Paso a Paso</h2>
+
+    <!-- Filtro de Categorías -->
+    <div class="cats-bar" id="cats-container"></div>
+
+    <!-- Lista de Demostraciones -->
+    <div class="dems-list" id="dems-container"></div>
+
+    <!-- Encabezado del Teorema -->
+    <div class="theorem-header" id="theorem-header">
+      <div style="font-size:0.75rem; color:var(--accent-purple); font-weight:bold; text-transform:uppercase;" id="th-cat">Lógica Matemática</div>
+      <div style="font-size:1.02rem; font-weight:bold; color:var(--text-bright); margin:2px 0;" id="th-title">Cargando Teorema...</div>
+      <div style="font-size:0.85rem; color:var(--text-color);" id="th-formula"></div>
+    </div>
+
+    <!-- Grid de Demostración -->
+    <div class="grid-layout">
+      <!-- Lista de Pasos -->
+      <div class="steps-container" id="steps-container"></div>
+
+      <!-- Visor de Enfoque y Controles -->
+      <div class="focus-card">
+        <div class="focus-box">
+          <div>
+            <div class="step-badge" id="focus-step-num">Paso 1 — Justificación</div>
+            <div style="font-size:0.92rem; color:var(--text-bright); line-height:1.4;" id="focus-enunciado">...</div>
+          </div>
+          <div style="font-size:0.78rem; color:var(--accent-green); margin-top:6px; font-weight:bold;" id="focus-just">...</div>
+        </div>
+
+        <div>
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="progress-fill" style="width: 20%;"></div>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:0.72rem; color:var(--text-muted); margin-top:3px;">
+            <span>Inicio</span>
+            <span id="step-counter">1 / 5 pasos</span>
+            <span>Q.E.D. □</span>
+          </div>
+        </div>
+
+        <div class="nav-controls">
+          <button class="btn-nav" id="btn-prev" onclick="prevStep()">◀ Anterior</button>
+          <button class="btn-nav btn-play" id="btn-auto" onclick="toggleAuto()">▶ Auto</button>
+          <button class="btn-nav" id="btn-next" onclick="nextStep()">Siguiente ▶</button>
+        </div>
+
+        <button class="btn-nav" onclick="resetDem()" style="font-size:0.75rem;">↺ Reiniciar al Paso 1</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Sincronización de tema
+    window.addEventListener('message', (event) => {
+      if (event.data && event.data.type === 'THEME_CHANGE') {
+        document.documentElement.setAttribute('data-theme', event.data.theme);
+      }
+    });
+    try {
+      if (window.parent && window.parent.document) {
+        const isDark = window.parent.document.body.classList.contains('dark') || window.parent.document.documentElement.getAttribute('data-theme') === 'dark';
+        document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+      }
+    } catch(e) {}
+
+    // ── BANCO DE 12 DEMOSTRACIONES FORMALES ──────────────────────────────
+    const DEMOSTRACIONES = [
+      {
+        id: "dm1",
+        categoria: "Lógica Proposicional",
+        titulo: "Leyes de De Morgan: ¬(p ∧ q) ≡ ¬p ∨ ¬q",
+        formula: "\\neg(p \\land q) \\;\\equiv\\; \\neg p \\lor \\neg q",
+        pasos: [
+          { n: 1, enunciado: "Queremos demostrar que \\(\\neg(p \\land q)\\) es lógicamente equivalente a \\(\\neg p \\lor \\neg q\\).", justificacion: "Objetivo de la demostración" },
+          { n: 2, enunciado: "Construimos la tabla de verdad exhaustiva para las 4 combinaciones de \\(p\\) y \\(q\\).", justificacion: "Método: Tablas de verdad (2² = 4 filas)" },
+          { n: 3, enunciado: "Fila (V, V): \\(p \\land q = V \\implies \\neg(p \\land q) = F\\). Por otro lado: \\(\\neg p \\lor \\neg q = F \\lor F = F\\). Coinciden en F.", justificacion: "Evaluación caso (V, V)" },
+          { n: 4, enunciado: "Fila (V, F): \\(p \\land q = F \\implies \\neg(p \\land q) = V\\). Por otro lado: \\(\\neg p \\lor \\neg q = F \\lor V = V\\). Coinciden en V.", justificacion: "Evaluación caso (V, F)" },
+          { n: 5, enunciado: "Fila (F, V): \\(p \\land q = F \\implies \\neg(p \\land q) = V\\). Por otro lado: \\(\\neg p \\lor \\neg q = V \\lor F = V\\). Coinciden en V.", justificacion: "Evaluación caso (F, V)" },
+          { n: 6, enunciado: "Fila (F, F): \\(p \\land q = F \\implies \\neg(p \\land q) = V\\). Por otro lado: \\(\\neg p \\lor \\neg q = V \\lor V = V\\). Coinciden en V.", justificacion: "Evaluación caso (F, F)" },
+          { n: 7, enunciado: "Las columnas coinciden en todas las interpretaciones posibles. ∴ \\(\\neg(p \\land q) \\equiv \\neg p \\lor \\neg q\\). \\(\\blacksquare\\)", justificacion: "Equivalencia lógica formal (Q.E.D.)" },
+        ]
+      },
+      {
+        id: "dm2",
+        categoria: "Lógica Proposicional",
+        titulo: "Silogismo Hipotético: p → q, q → r ⊢ p → r",
+        formula: "(p \\to q) \\land (q \\to r) \\implies (p \\to r)",
+        pasos: [
+          { n: 1, enunciado: "Premisa 1: \\(p \\to q\\).", justificacion: "Hipótesis 1" },
+          { n: 2, enunciado: "Premisa 2: \\(q \\to r\\).", justificacion: "Hipótesis 2" },
+          { n: 3, enunciado: "Supongamos que el antecedente \\(p\\) es verdadero.", justificacion: "Suposición para prueba directa" },
+          { n: 4, enunciado: "De \\(p\\) y \\(p \\to q\\), por Modus Ponens obtenemos \\(q\\).", justificacion: "Regla Modus Ponendo Ponens (m.p.p.)" },
+          { n: 5, enunciado: "De \\(q\\) y \\(q \\to r\\), por Modus Ponens obtenemos \\(r\\).", justificacion: "Regla Modus Ponendo Ponens (m.p.p.)" },
+          { n: 6, enunciado: "Hemos derivado \\(r\\) bajo la suposición de \\(p\\). Por el Teorema de la Deducción: \\(p \\to r\\). \\(\\blacksquare\\)",
+            justificacion: "Conclusión válida (Prueba directa)" },
+        ]
+      },
+      {
+        id: "dm3",
+        categoria: "Cuantificadores",
+        titulo: "Negación del Cuantificador Universal: ¬(∀x) p(x) ≡ (∃x) ¬p(x)",
+        formula: "\\neg(\\forall x \\in A)\\, p(x) \\;\\equiv\\; (\\exists x \\in A)\\, \\neg p(x)",
+        pasos: [
+          { n: 1, enunciado: "Supongamos que \\(\\neg(\\forall x \\in A) p(x)\\) es verdadera.", justificacion: "Hipótesis de partida" },
+          { n: 2, enunciado: "Por definición de negación, la proposición \\((\\forall x \\in A) p(x)\\) es falsa.", justificacion: "Definición de negación lógica" },
+          { n: 3, enunciado: "Para que un cuantificador universal sea falso, no todos los elementos del dominio pueden satisfacer \\(p(x)\\).", justificacion: "Semántica del cuantificador universal" },
+          { n: 4, enunciado: "Por consiguiente, existe al menos un elemento testigo \\(x_0 \\in A\\) tal que \\(p(x_0)\\) es falsa.", justificacion: "Existencia de contraejemplo" },
+          { n: 5, enunciado: "Que \\(p(x_0)\\) sea falsa equivale a que \\(\\neg p(x_0)\\) sea verdadera.", justificacion: "Equivalencia clásica" },
+          { n: 6, enunciado: "Al existir tal \\(x_0\\), se cumple formalmente \\((\\exists x \\in A) \\neg p(x)\\). ∴ \\(\\neg(\\forall x) p(x) \\equiv (\\exists x) \\neg p(x)\\). \\(\\blacksquare\\)", justificacion: "Semántica del cuantificador existencial" },
+        ]
+      },
+      {
+        id: "dm4",
+        categoria: "Teoría de Conjuntos",
+        titulo: "Leyes de De Morgan para Conjuntos: (A ∪ B)ᶜ = Aᶜ ∩ Bᶜ",
+        formula: "(A \\cup B)^c = A^c \\cap B^c",
+        pasos: [
+          { n: 1, enunciado: "Demostraremos la igualdad mediante equivalencia lógica de pertenencia para un elemento arbitrario \\(x\\).", justificacion: "Objetivo: Doble contención elemental" },
+          { n: 2, enunciado: "\\(x \\in (A \\cup B)^c\\)", justificacion: "Elemento en el complemento de la unión" },
+          { n: 3, enunciado: "\\(\\iff x \\notin (A \\cup B)\\)", justificacion: "Definición de complemento de conjuntos" },
+          { n: 4, enunciado: "\\(\\iff \\neg(x \\in A \\lor x \\in B)\\)", justificacion: "Definición de unión de conjuntos" },
+          { n: 5, enunciado: "\\(\\iff x \\notin A \\land x \\notin B\\)", justificacion: "Ley de De Morgan de la lógica proposicional" },
+          { n: 6, enunciado: "\\(\\iff x \\in A^c \\land x \\in B^c\\)", justificacion: "Definición de complemento" },
+          { n: 7, enunciado: "\\(\\iff x \\in A^c \\cap B^c\\). Dado que \\(x\\) fue arbitrario: \\((A \\cup B)^c = A^c \\cap B^c\\). \\(\\blacksquare\\)", justificacion: "Definición de intersección y conclusión" },
+        ]
+      },
+      {
+        id: "dm5",
+        categoria: "Teoría de Conjuntos",
+        titulo: "Descomposición de un Conjunto: A = (A ∩ B) ∪ (A ∖ B)",
+        formula: "A = (A \\cap B) \\cup (A \\setminus B)",
+        pasos: [
+          { n: 1, enunciado: "Recordamos que \\(A \\setminus B = A \\cap B^c\\). Reescribimos la expresión: \\((A \\cap B) \\cup (A \\cap B^c)\\).", justificacion: "Definición de diferencia relativa" },
+          { n: 2, enunciado: "Aplicamos la propiedad distributiva de la intersección respecto a la unión: \\(= A \\cap (B \\cup B^c)\\).", justificacion: "Distributividad de \\(\\cap\\) sobre \\(\\cup\\)" },
+          { n: 3, enunciado: "Por la ley del complemento universal, \\(B \\cup B^c = \\mathcal{U}\\) (el conjunto universo).", justificacion: "Propiedad del complemento: \\(B \\cup B^c = \\mathcal{U}\\)" },
+          { n: 4, enunciado: "Sustituyendo: \\(= A \\cap \\mathcal{U}\\).", justificacion: "Sustitución de conjuntos" },
+          { n: 5, enunciado: "Por la ley de identidad de la intersección con el universo: \\(A \\cap \\mathcal{U} = A\\). ∴ \\(A = (A \\cap B) \\cup (A \\setminus B)\\). \\(\\blacksquare\\)", justificacion: "Ley de identidad (Q.E.D.)" },
+        ]
+      },
+      {
+        id: "dm6",
+        categoria: "Métodos de Demostración",
+        titulo: "Irracionalidad de √2 (Reducción al Absurdo)",
+        formula: "\\sqrt{2} \\notin \\mathbb{Q}",
+        pasos: [
+          { n: 1, enunciado: "Supongamos por contradicción que \\(\\sqrt{2}\\) es un número racional: \\(\\sqrt{2} \\in \\mathbb{Q}\\).", justificacion: "Hipótesis de reducción al absurdo" },
+          { n: 2, enunciado: "Entonces existen enteros \\(a, b \\in \\mathbb{Z}\\) con \\(b \\neq 0\\) y fracción irreducible \\(\\text{mcd}(a, b) = 1\\) tales que \\(\\sqrt{2} = \\frac{a}{b}\\).", justificacion: "Definición de número racional irreducible" },
+          { n: 3, enunciado: "Elevando ambos miembros al cuadrado: \\(2 = \\frac{a^2}{b^2} \\implies a^2 = 2b^2\\).", justificacion: "Álgebra elemental" },
+          { n: 4, enunciado: "Como \\(a^2\\) es múltiplo de 2, \\(a^2\\) es par, lo cual implica necesariamente que \\(a\\) es par: \\(a = 2k\\) para algún \\(k \\in \\mathbb{Z}\\).", justificacion: "Lema: si \\(a^2\\) es par, \\(a\\) es par" },
+          { n: 5, enunciado: "Sustituimos \\(a = 2k\\): \\((2k)^2 = 2b^2 \\implies 4k^2 = 2b^2 \\implies b^2 = 2k^2\\).", justificacion: "Sustitución y simplificación" },
+          { n: 6, enunciado: "Esto demuestra que \\(b^2\\) es par, y por ende \\(b\\) también es par.", justificacion: "Mismo lema sobre \\(b\\)" },
+          { n: 7, enunciado: "Si \\(a\\) y \\(b\\) son ambos pares, ambos son divisibles entre 2, lo cual contradice que \\(\\text{mcd}(a, b) = 1\\). ∴ \\(\\sqrt{2} \\notin \\mathbb{Q}\\). \\(\\blacksquare\\)", justificacion: "Contradicción lógica \\(\\bot\\) alcanzada" },
+        ]
+      },
+      {
+        id: "dm7",
+        categoria: "Inducción Matemática",
+        titulo: "Suma de los Primeros n Naturales: ∑ i = n(n+1)/2",
+        formula: "\\sum_{i=1}^n i = 1 + 2 + \\dots + n = \\frac{n(n+1)}{2}",
+        pasos: [
+          { n: 1, enunciado: "Paso Base (\\(n=1\\)): \\(\\sum_{i=1}^1 i = 1\\). Por la fórmula: \\(\\frac{1(1+1)}{2} = \\frac{2}{2} = 1\\). La base es verdadera.", justificacion: "Verificación del paso base \\(P(1)\\)" },
+          { n: 2, enunciado: "Hipótesis de Inducción: Asumimos que para un entero \\(k \\ge 1\\) fijo se cumple \\(1 + 2 + \\dots + k = \\frac{k(k+1)}{2}\\).", justificacion: "Hipótesis inductiva \\(P(k)\\)" },
+          { n: 3, enunciado: "Tesis Inductiva: Debemos demostrar que para \\(k+1\\): \\(1 + 2 + \\dots + k + (k+1) = \\frac{(k+1)((k+1)+1)}{2} = \\frac{(k+1)(k+2)}{2}\\).", justificacion: "Objetivo del paso inductivo \\(P(k+1)\\)" },
+          { n: 4, enunciado: "Agrupamos los primeros \\(k\\) sumandos: \\([1 + 2 + \\dots + k] + (k+1)\\).", justificacion: "Asociatividad de la suma" },
+          { n: 5, enunciado: "Aplicamos la hipótesis inductiva a los primeros \\(k\\) términos: \\(= \\frac{k(k+1)}{2} + (k+1)\\).", justificacion: "Sustitución de hipótesis" },
+          { n: 6, enunciado: "Factorizamos el término común \\((k+1)\\): \\(= (k+1)\\left[\\frac{k}{2} + 1\\right] = (k+1)\\left[\\frac{k+2}{2}\\right] = \\frac{(k+1)(k+2)}{2}\\).", justificacion: "Factorización algebraica" },
+          { n: 7, enunciado: "Por el Principio de Inducción Matemática, la fórmula es válida para todo \\(n \\in \\mathbb{N}\\). \\(\\blacksquare\\)", justificacion: "Principio de Inducción completado" },
+        ]
+      },
+    ];
+
+    let currentCat = "Todos";
+    let currentDemIdx = 0;
+    let currentStepIdx = 0;
+    let isAutoRunning = false;
+    let autoInterval = null;
+
+    const cats = ["Todos", "Lógica Proposicional", "Cuantificadores", "Teoría de Conjuntos", "Métodos de Demostración", "Inducción Matemática"];
+
+    function renderCats() {
+      const cCont = document.getElementById("cats-container");
+      cCont.innerHTML = "";
+      cats.forEach(c => {
+        const btn = document.createElement("button");
+        btn.className = `btn-cat ${currentCat === c ? "active" : ""}`;
+        btn.innerText = c;
+        btn.onclick = () => {
+          currentCat = c;
+          currentDemIdx = 0;
+          currentStepIdx = 0;
+          stopAuto();
+          renderCats();
+          renderDems();
+          displayCurrentDem();
+        };
+        cCont.appendChild(btn);
+      });
+    }
+
+    function getFilteredDems() {
+      return currentCat === "Todos"
+        ? DEMOSTRACIONES
+        : DEMOSTRACIONES.filter(d => d.categoria === currentCat);
+    }
+
+    function renderDems() {
+      const dCont = document.getElementById("dems-container");
+      dCont.innerHTML = "";
+      const list = getFilteredDems();
+      list.forEach((d, idx) => {
+        const btn = document.createElement("button");
+        btn.className = `btn-dem ${currentDemIdx === idx ? "active" : ""}`;
+        btn.innerText = d.titulo.split(":")[0];
+        btn.onclick = () => {
+          currentDemIdx = idx;
+          currentStepIdx = 0;
+          stopAuto();
+          renderDems();
+          displayCurrentDem();
+        };
+        dCont.appendChild(btn);
+      });
+    }
+
+    function displayCurrentDem() {
+      const list = getFilteredDems();
+      const dem = list[currentDemIdx] || DEMOSTRACIONES[0];
+
+      document.getElementById("th-cat").innerText = dem.categoria;
+      document.getElementById("th-title").innerText = dem.titulo;
+      document.getElementById("th-formula").innerHTML = `\\(${dem.formula}\\)`;
+      renderMathInElement(document.getElementById("theorem-header"));
+
+      renderStepsList(dem);
+      updateFocusCard(dem);
+    }
+
+    function renderStepsList(dem) {
+      const sCont = document.getElementById("steps-container");
+      sCont.innerHTML = "";
+      dem.pasos.forEach((p, idx) => {
+        const div = document.createElement("div");
+        div.className = `step-item ${idx === currentStepIdx ? "active" : idx < currentStepIdx ? "passed" : "future"}`;
+        div.innerHTML = `
+          <div class="step-badge">${idx < currentStepIdx ? "✓ " : idx === currentStepIdx ? "▶ " : ""}Paso ${p.n} — ${p.justificacion}</div>
+          <div>${p.enunciado}</div>
+        `;
+        div.onclick = () => {
+          currentStepIdx = idx;
+          stopAuto();
+          renderStepsList(dem);
+          updateFocusCard(dem);
+        };
+        sCont.appendChild(div);
+      });
+      renderMathInElement(sCont);
+    }
+
+    function updateFocusCard(dem) {
+      const p = dem.pasos[currentStepIdx] || dem.pasos[0];
+      const total = dem.pasos.length;
+      const pct = Math.round(((currentStepIdx + 1) / total) * 100);
+
+      document.getElementById("focus-step-num").innerText = `Paso ${p.n} de ${total}`;
+      document.getElementById("focus-enunciado").innerHTML = p.enunciado;
+      document.getElementById("focus-just").innerText = `Justificación: ${p.justificacion}`;
+      renderMathInElement(document.querySelector(".focus-box"));
+
+      document.getElementById("progress-fill").style.width = `${pct}%`;
+      document.getElementById("step-counter").innerText = `${currentStepIdx + 1} / ${total} pasos (${pct}%)`;
+
+      document.getElementById("btn-prev").disabled = (currentStepIdx === 0);
+      document.getElementById("btn-next").disabled = (currentStepIdx === total - 1);
+    }
+
+    function prevStep() {
+      if (currentStepIdx > 0) {
+        currentStepIdx--;
+        stopAuto();
+        const list = getFilteredDems();
+        renderStepsList(list[currentDemIdx]);
+        updateFocusCard(list[currentDemIdx]);
+      }
+    }
+
+    function nextStep() {
+      const list = getFilteredDems();
+      const dem = list[currentDemIdx];
+      if (currentStepIdx < dem.pasos.length - 1) {
+        currentStepIdx++;
+        stopAuto();
+        renderStepsList(dem);
+        updateFocusCard(dem);
+      }
+    }
+
+    function toggleAuto() {
+      if (isAutoRunning) {
+        stopAuto();
+      } else {
+        startAuto();
+      }
+    }
+
+    function startAuto() {
+      isAutoRunning = true;
+      document.getElementById("btn-auto").innerText = "⏸ Pausar";
+      autoInterval = setInterval(() => {
+        const list = getFilteredDems();
+        const dem = list[currentDemIdx];
+        if (currentStepIdx < dem.pasos.length - 1) {
+          currentStepIdx++;
+          renderStepsList(dem);
+          updateFocusCard(dem);
+        } else {
+          stopAuto();
+        }
+      }, 1800);
+    }
+
+    function stopAuto() {
+      isAutoRunning = false;
+      clearInterval(autoInterval);
+      document.getElementById("btn-auto").innerText = "▶ Auto";
+    }
+
+    function resetDem() {
+      currentStepIdx = 0;
+      stopAuto();
+      const list = getFilteredDems();
+      renderStepsList(list[currentDemIdx]);
+      updateFocusCard(list[currentDemIdx]);
+    }
+
+    // Inicialización
+    renderCats();
+    renderDems();
+    displayCurrentDem();
+  </script>
+</body>
+</html>
